@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../data/firebase/user/user_insert_update.dart';
@@ -24,7 +25,6 @@ class MediaController extends GetxController {
         isVideo: isVideo,
       );
 
-      Get.snackbar("Success", "Uploaded successfully");
     } catch (e) {
       Get.snackbar("Upload Failed", e.toString());
     } finally {

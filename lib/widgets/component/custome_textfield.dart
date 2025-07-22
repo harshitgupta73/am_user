@@ -13,6 +13,7 @@ class CustomTextField extends StatefulWidget {
   final bool readOnly;
   final int maxLines;
   final double? fontSize;
+  final Color? color;
 
   const CustomTextField({
     super.key,
@@ -28,6 +29,7 @@ class CustomTextField extends StatefulWidget {
     this.validator,
     this.readOnly = false,
     this.maxLines = 1,
+    this.color
   });
 
   @override
@@ -40,7 +42,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      style: TextStyle(color: Colors.white,fontSize: widget.fontSize),
+      style: TextStyle(color: widget.color,fontSize: widget.fontSize),
       controller: widget.controller,
       keyboardType: widget.inputType,
       obscureText: widget.isPassword ? _obscureText : false,
@@ -51,7 +53,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
       decoration: InputDecoration(
         labelText: widget.label,
+        labelStyle: TextStyle(color: widget.color),
         hintText: widget.hint,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey), // Default color
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey), // 👈 Same color when focused
+        ),
         prefixIcon: widget.prefixIcon != null
             ? Icon(widget.prefixIcon)
             : null,

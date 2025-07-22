@@ -28,9 +28,9 @@ class WorkerMethod{
   }
 
 
-  Future<void> createWorker(WorkerModal worker) async {
+  Future<void> createWorker(WorkerModal worker,String id) async {
     try {
-      await _workerCollection.add(worker.toJson());
+      await _workerCollection.doc(id).set(worker.toJson());
       debugPrint('✅ Worker created with ID: ${worker.workerName}');
     } catch (e) {
       debugPrint('❌ Error creating worker: $e');

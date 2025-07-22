@@ -1,6 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class WorkerModal {
+  String? workerId;
   String? workerName;
   String? address;
   String? otherSkills;
@@ -9,10 +12,12 @@ class WorkerModal {
   String? selectedGender;
   String? stateValue;
   String? distValue;
-  String? jobWorkCategory;
-  String? jobWork;
+  List<String>? workType;
+  Map<String, dynamic>? position; // Contains 'geopoint' and 'geohash'
+  Timestamp? lastUpdated;
 
   WorkerModal({
+    this.workerId,
     this.workerName,
     this.workerContat,
     this.address,
@@ -21,13 +26,15 @@ class WorkerModal {
     this.selectedGender,
     this.stateValue,
     this.distValue,
-    this.jobWorkCategory,
-    this.jobWork,
+    this.workType,
+    this.position,
+    this.lastUpdated,
   });
 
   // Convert from JSON (excluding Uint8List which is binary and not JSON-serializable directly)
   factory WorkerModal.fromJson(Map<String, dynamic> json) {
     return WorkerModal(
+      workerId: json['workerId'] as String?,
       workerName: json['workerName'] as String?,
       workerContat: json['workerContact'] as String?,
       address: json['address'] as String?,
@@ -35,15 +42,17 @@ class WorkerModal {
       selectedGender: json['selectedGender'] as String?,
       stateValue: json['stateValue'] as String?,
       distValue: json['distValue'] as String?,
-      jobWorkCategory: json['jobWorkCategory'] as String?,
-      jobWork: json['jobWork'] as String?,
+      workType: (json['workType'] as List<dynamic>?)?.cast<String>(),
       workerImage: json['workerImage'] as String,
+      position: json['position'] as Map<String, dynamic>?,
+      lastUpdated: json['lastUpdated'] as Timestamp?,
     );
   }
 
   // Convert to JSON (excluding binary serialization)
   Map<String, dynamic> toJson() {
     return {
+      'workerId' :workerId,
       'workerName': workerName,
       'workerContact':workerContat,
       'address': address,
@@ -51,9 +60,11 @@ class WorkerModal {
       'selectedGender': selectedGender,
       'stateValue': stateValue,
       'distValue': distValue,
-      'jobWorkCategory': jobWorkCategory,
-      'jobWork': jobWork,
-      'workerImage': workerImage, // Convert Uint8List to List<int> for JSON
+      'workType': workType,
+      'workerImage': workerImage,
+      'position': position,
+      'lastUpdated': lastUpdated,
+      // Convert Uint8List to List<int> for JSON
     };
   }
 }

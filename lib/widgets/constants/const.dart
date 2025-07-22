@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 
-const backgroundColor = Color.fromRGBO(38, 30, 57,1);
+const backgroundColor = Colors.white;
 const forgroundColor = Colors.black;
 const searchBoxColor = Color.fromRGBO(40, 20, 30, 1);
 
 
 
 
-const customTextColor = Colors.white;
+const customTextColor = Colors.black;
 
 const stateList = [
 

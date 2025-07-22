@@ -1,6 +1,9 @@
 import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:geoflutterfire3/geoflutterfire3.dart';
+import 'package:location/location.dart';
 
 class GorakhpurPlacesScreen extends StatefulWidget {
   @override
@@ -8,78 +11,77 @@ class GorakhpurPlacesScreen extends StatefulWidget {
 }
 
 class _GorakhpurPlacesScreenState extends State<GorakhpurPlacesScreen> {
-  List<String> placeNames = [];
-  bool isLoading = true;
+  final geo = GeoFlutterFire();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchPlaceNames();
+  Future<void> updateUserLocation(String userId) async {
+    Location location = Location();
+
+    // Request permission
+    PermissionStatus permissionGranted = await location.requestPermission();
+    if (permissionGranted != PermissionStatus.granted) return;
+
+    // Get current location
+    LocationData locData = await location.getLocation();
+    double latitude = locData.latitude!;
+    double longitude = locData.longitude!;
+
+    // Create GeoFirePoint
+    GeoFirePoint myLocation = geo.point(latitude: latitude, longitude: longitude);
+
+    // Save to Firestore
+    await firestore.collection('users_c').doc(userId).set({
+      'name': 'John Doe',
+      'position': myLocation.data,
+      'lastUpdated': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
-  Future<void> fetchPlaceNames() async {
-    final String overpassQuery = '''
-    [out:json][timeout:25];
-    area["name"="Gorakhpur"]["boundary"="administrative"]["admin_level"="6"]->.searchArea;
-    (
-      node["name"](area.searchArea);
-      way["name"](area.searchArea);
-      relation["name"](area.searchArea);
+  Future<void> queryNearbyUsers(double lat, double lng,
+      double radiusInKm) async {
+    GeoFirePoint center = geo.point(latitude: lat, longitude: lng);
+
+    var collectionRef = firestore.collection('users_c');
+
+    final stream = geo.collection(collectionRef: collectionRef)
+        .within(
+      center: center,
+      radius: radiusInKm,
+      field: 'position',
+      strictMode: true,
     );
-    out body;
-    >;
-    out skel qt;
-    ''';
 
-    try {
-      final response = await http.post(
-        Uri.parse('https://overpass-api.de/api/interpreter'),
-        body: {'data': overpassQuery},
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final elements = data['elements'] as List;
-
-        final names = <String>{};
-
-        for (var element in elements) {
-          if (element['tags'] != null && element['tags']['name'] != null) {
-            names.add(element['tags']['name']);
-          }
-        }
-
-        setState(() {
-          placeNames = names.toList()..sort();
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load Overpass data');
+    stream.listen((List<DocumentSnapshot> documentList) {
+      for (var doc in documentList) {
+        print('Nearby user: ${doc.data()}');
       }
-    } catch (e) {
-      print("Error: $e");
-      setState(() {
-        isLoading = false;
-      });
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Named Places - Gorakhpur, U.P.')),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : placeNames.isEmpty
-          ? Center(child: Text("No named places found."))
-          : ListView.builder(
-        itemCount: placeNames.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: Icon(Icons.place),
-            title: Text(placeNames[index]),
-          );
-        },
+      body:Center(
+        child: Column(
+          children: [
+            SizedBox(height: 100,),
+            ElevatedButton(
+              onPressed: () async {
+                // Save current user's location
+                await updateUserLocation('user125');
+              },
+              child: Text('Save Users'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                // Query users within 5 km
+                LocationData location = await Location().getLocation();
+                await queryNearbyUsers(location.latitude!, location.longitude!, 5);
+              },
+              child: Text('Find Nearby Users'),
+            ),
+          ],
+        ),
       ),
     );
   }

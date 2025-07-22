@@ -6,14 +6,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ListDetailsCardForWeb extends StatefulWidget {
+  String? id;
   String? image;
   String? name;
   String? work;
   String? contact;
-  String? id;
 
-
-  ListDetailsCardForWeb({super.key,required this.work, required this.name, required this.image,required this.contact});
+  ListDetailsCardForWeb({
+    super.key,
+    this.id,
+    required this.work,
+    required this.name,
+    required this.image,
+    required this.contact,
+  });
 
   @override
   State<ListDetailsCardForWeb> createState() => _ListDetailsCardForWebState();
@@ -22,33 +28,38 @@ class ListDetailsCardForWeb extends StatefulWidget {
 class _ListDetailsCardForWebState extends State<ListDetailsCardForWeb> {
   @override
   Widget build(BuildContext context) {
-    final size  = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return Card(
-      elevation: 2,
-      shadowColor: Colors.white,
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-
-      ),
+      elevation: 3,
+      shadowColor: Colors.grey,
+      margin: EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
-
-        padding: EdgeInsets.all(10),
-
+        padding: EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(10)
-
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(width: 2, color: Colors.black)
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // CircleAvatar(
-            //   backgroundImage: widget.image ==null? AssetImage("assets/images/amuserlogo.png"): MemoryImage(widget.image!),
-            //   radius: Responsive.isDesktop(context)?60:Responsive.isTab(context)?40:30,
-            // ),
-            SizedBox(width:Responsive.isMobile(context)?size.width/50 :size.width/70,),
+            CircleAvatar(
+              radius:
+                  Responsive.isDesktop(context)
+                      ? 60
+                      : Responsive.isTab(context)
+                      ? 40
+                      : 30,
+              backgroundImage: NetworkImage(widget.image!),
+            ),
+            SizedBox(
+              width:
+                  Responsive.isMobile(context)
+                      ? size.width / 50
+                      : size.width / 70,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 physics: NeverScrollableScrollPhysics(),
@@ -56,32 +67,59 @@ class _ListDetailsCardForWebState extends State<ListDetailsCardForWeb> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AutoSizeText(widget.name!,style: TextStyle(color: Colors.white,fontSize:Responsive.isMobile(context)?21:40 ), minFontSize: 10,maxFontSize: 40,maxLines: 1,),
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       AutoSizeText(
-                         (widget.work ?? "")
-                             .split(',')
-                             .map((e) => e.trim())
-                             .take(2)
-                             .join(", "),
-                         style: TextStyle(
-                           color: Colors.white70,
-                           fontSize: Responsive.isTab(context)
-                               ? 20
-                               : Responsive.isMobile(context)
-                               ? 15
-                               : 40,
-                         ),
-                         minFontSize: 10,
-                         maxFontSize: 40,
-                         maxLines: 1,
-                         overflow: TextOverflow.ellipsis,
-                       ),
-                       Responsive.isDesktop(context) && size.width>1200   || Responsive.isMobile(context)? AutoSizeText(widget.contact!,style: TextStyle(color: Colors.white70,fontSize:Responsive.isTab(context)?20:Responsive.isMobile(context)?14: 40),minFontSize: 10,maxFontSize: 40,maxLines: 1,):Container(),
-                     ],
-                   )
+                    AutoSizeText(
+                      widget.name!,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: Responsive.isMobile(context) ? 21 : 40,
+                      ),
+                      minFontSize: 10,
+                      maxFontSize: 40,
+                      maxLines: 1,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AutoSizeText(
+                          (widget.work ?? "")
+                              .split(',')
+                              .map((e) => e.trim())
+                              .take(2)
+                              .join(", "),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize:
+                                Responsive.isTab(context)
+                                    ? 20
+                                    : Responsive.isMobile(context)
+                                    ? 15
+                                    : 40,
+                          ),
+                          minFontSize: 10,
+                          maxFontSize: 40,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Responsive.isDesktop(context) && size.width > 1200 ||
+                                Responsive.isMobile(context)
+                            ? AutoSizeText(
+                              widget.contact!,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    Responsive.isTab(context)
+                                        ? 20
+                                        : Responsive.isMobile(context)
+                                        ? 14
+                                        : 40,
+                              ),
+                              minFontSize: 10,
+                              maxFontSize: 40,
+                              maxLines: 1,
+                            )
+                            : Container(),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -92,22 +130,37 @@ class _ListDetailsCardForWebState extends State<ListDetailsCardForWeb> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   CircleAvatar(
-                      radius: Responsive.isDesktop(context)? size.height/35:size.height/45,
+                    radius:
+                        Responsive.isDesktop(context)
+                            ? size.height / 35
+                            : size.height / 45,
 
-                      child: Center(child: Icon(Icons.phone,color: Colors.black,size: Responsive.isDesktop(context)?30:25,),)),
-                  SizedBox(width: 10,),
-                  CircleAvatar(
-                    radius: Responsive.isDesktop(context)? size.height/35:size.height/45,
-
-                    child: Center(child: Icon(Icons.message ,color: Colors.black,size: Responsive.isDesktop(context)?30:25,),),
+                    child: Center(
+                      child: Icon(
+                        Icons.phone,
+                        color: Colors.blue,
+                        size: Responsive.isDesktop(context) ? 30 : 25,
+                      ),
+                    ),
                   ),
+                  SizedBox(width: 10),
+                  CircleAvatar(
+                    radius:
+                        Responsive.isDesktop(context)
+                            ? size.height / 35
+                            : size.height / 45,
 
+                    child: Center(
+                      child: Icon(
+                        Icons.message,
+                        color: Colors.green,
+                        size: Responsive.isDesktop(context) ? 30 : 25,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-
-
-
           ],
         ),
       ),

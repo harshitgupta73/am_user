@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:am_user/business_categories/business_type.dart';
 import 'package:am_user/controller/user_provider/get_user_provider.dart';
 import 'package:am_user/modals/userModal.dart';
 import 'package:am_user/modals/worker_modal.dart';
@@ -14,6 +15,7 @@ import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/routs/routs.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -37,10 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
   final SharePreferencesMethods _sharePreferencesMethods = SharePreferencesMethods();
   final userController = Get.find<GetUserController>();
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   int _currentIndex = 0;
   List<dynamic>_filterList = [];
 
   final TextEditingController _searchController = TextEditingController();
+
+  String option="";
+  String selectedCategory='';
+  String selectedSubCategory='';
 
   final driver = DriverModal(
     driverName: 'Ramesh Singh',
@@ -53,11 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
     vehicleRcImage: 'https://via.placeholder.com/400x200.png?text=RC+Image',
     driverImage: 'https://randomuser.me/api/portraits/men/45.jpg',
     drivingLicence: 'https://via.placeholder.com/400x200.png?text=Driving+Licence',
-    gender: 'Male',
     stateValue: 'Maharashtra',
     distValue: 'Mumbai',
-    jobWorkCategory: 'Transport',
-    jobWork: 'Delivery',
   );
 
 
@@ -82,52 +87,55 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     await userController.getUser();
     userModal = userController.myUser;
+    print("user = ${userController.myUser!.name}");
     if(userModal!=null){
       _sharePreferencesMethods.saveUserToSharedPref(userModal!);
       setState(() {});
     }
   }
+  String screen="";
+
+  void fun(){
+    if(userController.shopModal.value != null) screen='type_dashboard';
+    else if(userController.workerModal.value != null) screen='type_dashboard';
+    else if(userController.driverModal.value != null) screen='type_dashboard';
+    else screen='user_dashboard';
+  }
+
 
 
   @override
   void initState() {
     super.initState();
     getUserData();
-    workers = List.generate(20, (index) => WorkerModal(
-      workerName: 'Amit Kumar $index',
-      address: 'Address $index, Delhi',
-      otherSkills: 'Plumbing, Painting',
-      workerContat: '6320185485',
-      selectedGender: 'Male',
-      stateValue: 'Delhi',
-      distValue: 'Central Delhi',
-      jobWorkCategory: 'Construction',
-      jobWork: 'Mason',
-      workerImage: null,
-    ),);
-    _searchController.addListener(_onChange);
+    // print("_sharePreferencesMethods.getUserType() = ${_sharePreferencesMethods.getUserType()}");
+    fun();
+    if(!Platform.isAndroid){
+      print("object");
+    }
+    // _searchController.addListener(_onChange);
   }
 
   final controller = Get.put(Controller());
 
 
-  void _onChange() {
-    final query = _searchController.text.toLowerCase();
-
-    setState(() {
-      _filterList = workers.where((element) {
-        final jobMatch = element.jobWork
-            ?.split(',')
-            .any((e) => e.trim().toLowerCase().contains(query)) ??
-            false;
-
-        final nameMatch =
-            element.workerName?.toLowerCase().contains(query) ?? false;
-
-        return jobMatch || nameMatch;
-      }).toList();
-    });
-  }
+  // void _onChange() {
+  //   final query = _searchController.text.toLowerCase();
+  //
+  //   setState(() {
+  //     // _filterList = workers.where((element) {
+  //     //   final jobMatch = element.jobWork
+  //     //       ?.split(',')
+  //     //       .any((e) => e.trim().toLowerCase().contains(query)) ??
+  //     //       false;
+  //
+  //       final nameMatch =
+  //           element.workerName?.toLowerCase().contains(query) ?? false;
+  //
+  //       return jobMatch || nameMatch;
+  //     }).toList();
+  //   });
+  // }
 
   navigateToProfileScreen(UserModal user) {
     if (!isSkiaWeb) {
@@ -159,12 +167,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 InkWell(
                   onTap: () {
                     // navigateToProfileScreen(userModal);
-                    context.push(RoutsName.dashBord);
-
+                    screen =="user_dashboard" ?
+                    context.go(RoutsName.profileScreen) : context.go(RoutsName.typeDashboard);
                   },
                   child: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: userModal?.image == null || userModal!.image!.isEmpty?AssetImage(logo): MemoryImage(base64Decode(userModal!.image!).buffer.asUint8List()),
+                    radius: 25,
+                    backgroundImage: userModal?.image == null || userModal!.image!.isEmpty?AssetImage(logo): NetworkImage(userModal!.image!),
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -206,20 +214,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     controller: _searchController,
                     label: "Search here",
-
                   )),
                 IconButton(
                   onPressed: () {
                     //context.push(RoutsName.allChats, extra: workers);
-                   SharePlus.instance.share(
-                        ShareParams(text: 'check out my website https://example.com')
-                   );
-
+                    // context.push(RoutsName.);
                   },
-                  icon: Icon(Icons.share),
+                  icon: Icon(Icons.notifications,color: Colors.black54,),
+                  color: customTextColor,
+                ),
+                IconButton(
+                  onPressed: () {
+                    //context.push(RoutsName.allChats, extra: workers);
+                    SharePlus.instance.share(
+                        ShareParams(text: 'check out my website https://example.com')
+                    );
+                  },
+                  icon: Icon(Icons.share,color: Colors.green,),
                   color: customTextColor,
                 ),
                 popUpMenu(),
+                // IconButton(
+                //   icon: const Icon(Icons.menu),
+                //   onPressed: () {
+                //     _scaffoldKey.currentState?.openEndDrawer();
+                //   },
+                // ),
               ],
             ),
           ),
@@ -288,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   Container(
-                    margin: EdgeInsets.only(top: 20, left: 20),
+                    margin: EdgeInsets.only( left: 20),
                     child: AutoSizeText(
                       "Recommended Services",
                       minFontSize: 20,
@@ -330,22 +350,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       itemBuilder: (context, index) {
                         final users = controller.allUsers[index];
+                        print("users = ${users.name}");
                         return InkWell(
-
                           onTap: () {
-
                             if (kIsWeb) {
                               context.push("${RoutsName.cardDetailScreen}?userData=$driver");
                             } else {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CardDetailsScreen(driver: driver),
+                                  builder: (context) => CardDetailsScreen(users:users),
                                 ),
                               );
                             }
                           },
                           child: ListDetailsCardForWeb(
+                            id:users.id,
                             work: users.type,
                             image: users.image,
                             name: users.name,
@@ -364,36 +384,84 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void showMainCategoryMenu(context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    showMenu<String>(
+      context: context,
+      color: Colors.blue,
+      position: RelativeRect.fromRect(
+        position & const Size(40, 40),
+        Offset.zero & overlay.size,
+      ),
+      items: Provider().business_category.keys
+          .map((main) => PopupMenuItem<String>(
+        value: main,
+        child: Text(main),
+      ))
+          .toList(),
+    ).then((selectedMainCategory) {
+      if (selectedMainCategory != null) {
+        final subCategories = Provider().business_category[selectedMainCategory]!;
+        final newPos = Offset(position.dx + 200, position.dy); // adjust as needed
+        showSubCategoriesMenu(context, newPos, subCategories);
+      }
+    });
+  }
+
+  void showSubCategoriesMenu(BuildContext context, Offset position, List<String> subCategories) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    showMenu<String>(
+      context: context,
+      color: Colors.blue,
+      position: RelativeRect.fromRect(
+        position & const Size(40, 40),
+        Offset.zero & overlay.size,
+      ),
+      items: subCategories
+          .map((sub) => PopupMenuItem<String>(
+        value: sub,
+        child: Text(sub),
+      ))
+          .toList(),
+    ).then((value) {
+      if (value != null) {
+        print("Selected Subcategory: $value");
+      }
+    });
+  }
 
   Widget popUpMenu() {
     return PopupMenuButton(
       color: backgroundColor,
-      icon: Icon(Icons.menu, color: Colors.white,),
+      icon: Icon(Icons.menu, color: Colors.black,),
       itemBuilder: (context) {
         return [
           PopupMenuItem(
-              onTap: () {
-                customNavigate(context, RoutsName.shopRegisterScreen,null);
-              },
-              child: Row(
-                children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-
-                        image: DecorationImage(
-                            image: AssetImage(
-                                "assets/images/104a911c63dcaf4814ee6136c5825d5b.jpg"),
-                            fit: BoxFit.cover)
+              child: GestureDetector(
+                onTapDown: (details) {
+                  Navigator.pop(context); // close current popup
+                  showMainCategoryMenu(context, details.globalPosition);
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                              image: AssetImage(
+                                  "assets/images/104a911c63dcaf4814ee6136c5825d5b.jpg"),
+                              fit: BoxFit.cover)
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 10,),
-                  Text("Business & Shop",style: TextStyle(color: Colors.white),)
-                ],
+                    SizedBox(width: 10,),
+                    Text("Business & Shop",style: TextStyle(color: Colors.black),)
+                  ],
+                ),
               )),
-
           PopupMenuItem(
               onTap: () {
                 customNavigate(context, RoutsName.workRegisterScreen, null);
@@ -414,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(width: 10,),
-                  Text("Profession & Worker",style: TextStyle(color: Colors.white),)
+                  Text("Profession & Worker",style: TextStyle(color: Colors.black),)
                 ],
               )),
           PopupMenuItem(
@@ -436,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(width: 10,),
-                  Text("Vehicle",style: TextStyle(color: Colors.white),)
+                  Text("Vehicle",style: TextStyle(color: Colors.black),)
                 ],
               )),
           PopupMenuItem(
@@ -458,7 +526,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(width: 10,),
-                  Text("Profile",style: TextStyle(color: Colors.white),)
+                  Text("Profile",style: TextStyle(color: Colors.black),)
                 ],
               )),
           PopupMenuItem(
@@ -480,24 +548,96 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   SizedBox(width: 10,),
-                  Text("Ad Center",style: TextStyle(color: Colors.white),)
+                  Text("Ad Center",style: TextStyle(color: Colors.black),)
                 ],
               )),
 
 
           PopupMenuItem(
-              onTap: () {
-
+              onTap: ()async {
+                FirebaseAuth.instance.signOut();
+                userController.clearUser();
+                _sharePreferencesMethods.clearUserData();
+                context.go(RoutsName.registrationScreen);
               },
               child: Row(
                 children: [
-                  Icon(Icons.logout, size: 30,color: Colors.white,),
+                  Icon(Icons.logout, size: 30,color: Colors.black,),
                   SizedBox(width: 15,),
-                  Text("Log Out",style: TextStyle(color: Colors.white),)
+                  Text("Log Out",style: TextStyle(color: Colors.black),)
                 ],
               )),
-
         ];
       },);
+  }
+
+  Drawer _buildRightDrawer() {
+    return Drawer(
+      width: 300,
+      backgroundColor: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const SizedBox(height: 20),
+          ExpansionTile(
+            title: const Text("Business & Shop",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            children: Provider().business_category.entries.map((entry) {
+              return ExpansionTile(
+                title: Text(entry.key),
+                children: entry.value
+                    .map(
+                      (sub) => ListTile(
+                    title: Text(sub),
+                    onTap: () {
+                      Navigator.pop(context);
+                      print("Selected Subcategory: $sub");
+                    },
+                  ),
+                )
+                    .toList(),
+              );
+            }).toList(),
+          ),
+          // const Divider(),
+          ListTile(
+            title: const Text("Profession & Worker"),
+            onTap: () {
+              Navigator.pop(context);
+              // customNavigate(context, RoutsName.workRegisterScreen, null);
+            },
+          ),
+          ListTile(
+            title: const Text("Vehicle"),
+            onTap: () {
+              Navigator.pop(context);
+              // context.push(RoutsName.driverRegisterScreen);
+            },
+          ),
+          ListTile(
+            title: const Text("Profile"),
+            onTap: () {
+              Navigator.pop(context);
+              // navigateToProfileScreen(userModal!);
+            },
+          ),
+          ListTile(
+            title: const Text("Ad Center"),
+            onTap: () {
+              Navigator.pop(context);
+              // context.push(RoutsName.adRegisterScreen);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text("Log Out"),
+            onTap: () {
+              Navigator.pop(context);
+              // perform logout
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

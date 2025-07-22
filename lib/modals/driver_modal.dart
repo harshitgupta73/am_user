@@ -1,27 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class DriverModal {
+  String? driverId;
   String? driverName;
   String? driverContact;
   String? email;
   String? driverLicenceNo;
   String? vehicleNo;
+  String? vehicleName;
   String? vehicleOwnerName;
   String? driverAddress;
   String? driverOtherSkill;
   String? vehicleRcImage;
   String? driverImage;
   String? drivingLicence;
-  String? gender;
   String? stateValue;
   String? distValue;
-  String? jobWorkCategory;
-  String? jobWork;
+  Map<String, dynamic>? position; // Contains 'geopoint' and 'geohash'
+  Timestamp? lastUpdated;
 
   DriverModal({
+    this.driverId,
     this.driverName,
     this.driverContact,
     this.driverLicenceNo,
     this.email,
-
+    this.vehicleName,
     this.vehicleNo,
     this.vehicleOwnerName,
     this.driverAddress,
@@ -29,21 +33,22 @@ class DriverModal {
     this.vehicleRcImage,
     this.driverImage,
     this.drivingLicence,
-    this.gender,
     this.stateValue,
     this.distValue,
-    this.jobWorkCategory,
-    this.jobWork,
+    this.position,
+    this.lastUpdated,
   });
 
 
   // Optional: Convert to JSON
   Map<String, dynamic> toJson() {
     return {
+      'driverId': driverId,
       'driverName': driverName,
       'driverContact': driverContact,
       'driverLicenceNo': driverLicenceNo,
       'email':email,
+      'vehicleName': vehicleName,
       'vehicleNo': vehicleNo,
       'vehicleOwnerName': vehicleOwnerName,
       'driverAddress': driverAddress,
@@ -51,11 +56,10 @@ class DriverModal {
       'vehicleRcImage': vehicleRcImage,
       'driverImage': driverImage,
       'drivingLicence': drivingLicence,
-      'gender': gender,
       'stateValue': stateValue,
       'distValue': distValue,
-      'jobWorkCategory': jobWorkCategory,
-      'jobWork': jobWork,
+      'position': position,
+      'lastUpdated': lastUpdated,
     };
   }
 
@@ -63,22 +67,23 @@ class DriverModal {
   // Optional: Create from JSON
   factory DriverModal.fromJson(Map<String, dynamic> json) {
     return DriverModal(
+      driverId: json['driverId'],
       driverName: json['driverName'],
       driverContact: json['driverContact'],
       driverLicenceNo: json['driverLicenceNo'],
       vehicleNo: json['vehicleNo'],
       email: json['email'],
+      vehicleName: json['vehicleName'],
       vehicleOwnerName: json['vehicleOwnerName'],
       driverAddress: json['driverAddress'],
       driverOtherSkill: json['driverOtherSkill'],
       vehicleRcImage: json['vehicleRcImage'],
       driverImage: json['driverImage'],
       drivingLicence: json['drivingLicence'],
-      gender: json['gender'],
       stateValue: json['stateValue'],
       distValue: json['distValue'],
-      jobWorkCategory: json['jobWorkCategory'],
-      jobWork: json['jobWork'],
+      position: json['position'],
+      lastUpdated: json['lastUpdated'],
     );
   }
 }

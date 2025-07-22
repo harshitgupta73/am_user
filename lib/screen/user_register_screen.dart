@@ -56,12 +56,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       final contact = _contactController.text.trim();
       final password = _passwordController.text;
       final name = _nameController.text;
-      if(userImage.isEmpty){
-        userImage = await profilePlaceHolder();
-        print(".......");
-        print(userImage);
-      }
-      String image  = base64Encode(userImage);
 
 
      var result =await auth.registerWithEmailAndPassword(email: email, password: password);
@@ -71,7 +65,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
        email:   email,
         contact:  contact,
         name:  name,
-        image:  image,
+        image:  null,
       userId:   uid,
      );
 

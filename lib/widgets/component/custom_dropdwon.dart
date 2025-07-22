@@ -31,14 +31,15 @@ class CustomDropdown<T> extends StatelessWidget {
       decoration: InputDecoration(
 
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.black),
+        helperStyle: const TextStyle(color: Colors.black),
         filled: true,
-        fillColor: Colors.black,
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Colors.black),
           borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
@@ -46,9 +47,9 @@ class CustomDropdown<T> extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
-      dropdownColor: Colors.black,
-      iconEnabledColor: Colors.white,
-      style:  TextStyle(color: Colors.white,fontSize:fontSize ),
+      dropdownColor: Colors.white,
+      iconEnabledColor: Colors.black,
+      style:  TextStyle(color: Colors.black,fontSize:fontSize ),
       hint: Text(hint ?? '', style: const TextStyle(color: Colors.white70)),
       items: items.map((T item) {
         return DropdownMenuItem<T>(

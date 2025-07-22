@@ -1,8 +1,14 @@
+import 'package:am_user/screen/card_deatils_csreen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:am_user/widgets/component/searchBar.dart';
 import 'package:am_user/widgets/constants/const.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
+import '../controller/controllers.dart';
 import '../modals/worker_modal.dart';
+import '../responsive/reponsive_layout.dart';
 import '../widgets/component/list_deatils_card_for_web.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -13,6 +19,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   List<WorkerModal> _filteredItems = [];
   final TextEditingController _searchController = TextEditingController();
+  final controller =Get.find<Controller>();
 
   late List<WorkerModal> allWorkers;
 
@@ -27,26 +34,25 @@ class _SearchScreenState extends State<SearchScreen> {
       selectedGender: 'Male',
       stateValue: 'Delhi',
       distValue: 'Central Delhi',
-      jobWorkCategory: 'Construction',
-      jobWork: 'Mason',
+      workType: ['Plumbing', 'Painting'],
       workerImage: null,
     ));
 
     _filteredItems = allWorkers;
-    _searchController.addListener(_onSearchChanged);
+    // _searchController.addListener(_onSearchChanged);
   }
 
-  void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredItems = allWorkers.where((item) {
-        final nameMatch = item.workerName?.toLowerCase().contains(query) ?? false;
-        final skillMatch = item.otherSkills?.toLowerCase().contains(query) ?? false;
-        final jobMatch = item.jobWork?.toLowerCase().contains(query) ?? false;
-        return nameMatch || skillMatch || jobMatch;
-      }).toList();
-    });
-  }
+  // void _onSearchChanged() {
+  //   final query = _searchController.text.toLowerCase();
+  //   setState(() {
+  //     _filteredItems = allWorkers.where((item) {
+  //       final nameMatch = item.workerName?.toLowerCase().contains(query) ?? false;
+  //       final skillMatch = item.otherSkills?.toLowerCase().contains(query) ?? false;
+  //       // final jobMatch = item.jobWork?.toLowerCase().contains(query) ?? false;
+  //       // return nameMatch || skillMatch || jobMatch;
+  //     }).toList();
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -56,25 +62,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black, // always dark
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          "Search",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        elevation: 0,
+
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black, // status bar background
+        statusBarIconBrightness: Brightness.dark, // icons: time, battery
       ),
+    );
+    return Scaffold(
+      backgroundColor:backgroundColor,
       body: Column(
         children: [
+          const SizedBox(height: 30,),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: CustomSearchbar(
@@ -90,15 +89,47 @@ class _SearchScreenState extends State<SearchScreen> {
                 style: TextStyle(color: Colors.white),
               ),
             )
-                : ListView.builder(
-              itemCount: _filteredItems.length,
-              itemBuilder: (ctx, index) {
-                final item = _filteredItems[index];
-                return ListDetailsCardForWeb(
-                  work: item.jobWork ?? '',
-                  image: item.workerImage,
-                  name: item.workerName ?? '',
-                  contact: '', // Add contact if available in your model
+                : GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.allUsers.length,
+              shrinkWrap: true,
+              padding: Responsive.isMobile(context)
+                  ? EdgeInsets.zero
+                  : EdgeInsets.all(20),
+              gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
+                crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+                mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+                childAspectRatio:
+                Responsive.isDesktop(context)
+                    ? 20 / 5
+                    : Responsive.isMobile(context)
+                    ? 14 / 5
+                    : 15 / 5,
+              ),
+              itemBuilder: (context, index) {
+                final users = controller.allUsers[index];
+                return InkWell(
+                  onTap: () {
+                    if (kIsWeb) {
+                      // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CardDetailsScreen(users:users),
+                        ),
+                      );
+                    }
+                  },
+                  child: ListDetailsCardForWeb(
+                    id:users.id,
+                    work: users.type,
+                    image: users.image,
+                    name: users.name,
+                    contact: users.contact,
+                  ),
                 );
               },
             ),

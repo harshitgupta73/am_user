@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geoflutterfire3/geoflutterfire3.dart';
+import 'package:location/location.dart';
 
 import '../../../modals/driver_modal.dart';
 
@@ -6,12 +8,13 @@ class DriverMethods{
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> insertDriver(DriverModal driver) async {
+  Future<void> insertDriver(DriverModal driver,String randomId) async {
     try {
+
       await FirebaseFirestore.instance
           .collection('drivers')
-          // .doc(docId)
-          .add(driver.toJson());
+          .doc(randomId)
+          .set(driver.toJson());
       print('Driver inserted successfully');
     } catch (e) {
       print('Insert failed: $e');

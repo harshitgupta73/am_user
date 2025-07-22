@@ -4,6 +4,7 @@ class UserModal {
   final String? contact;
   final String? name;
   final String? image;
+
   final List<String>? images;
   final List<String>? videos;
 

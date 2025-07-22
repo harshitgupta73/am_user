@@ -1,9 +1,16 @@
+import 'dart:io';
+
+import 'package:am_user/controller/controllers.dart';
+import 'package:am_user/controller/job_controller/job_controller.dart';
 import 'package:am_user/controller/media_controllers/media_controller.dart';
 import 'package:am_user/controller/user_provider/get_user_provider.dart';
 import 'package:am_user/widgets/routs/routs.dart'; // should export 'GoRouter router'
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'controller/chat_controller/chat_controller.dart';
+import 'controller/image_picker_controller.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -14,7 +21,16 @@ void main() async {
 
   Get.put(GetUserController());
   Get.put(MediaController());
+  Get.put(Controller());
+  Get.put(ChatController());
+  Get.put(ImagePickerController());
+  Get.put(JobController());
 
+  if(kIsWeb) {
+    final controller = Get.find<Controller>();
+    controller.onInit();
+    print("kjdjbj");
+  }
   runApp(MyApp());
 }
 

@@ -1,15 +1,16 @@
+import 'package:am_user/controller/user_provider/get_user_provider.dart';
 import 'package:am_user/modals/userModal.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../responsive/reponsive_layout.dart';
 import '../widgets/component/banner_image.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final UserModal? user;
 
-  const ProfileScreen({super.key, this.user});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -34,12 +35,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: TextStyle(color: Colors.white),
       ),
       centerTitle: !isDesktop,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => Navigator.pop(context),
-      ),
+      // leading: IconButton(
+      //   icon: const Icon(Icons.arrow_back, color: Colors.white),
+      //   onPressed: () => Navigator.pop(context),
+      // ),
+      leading: null,
     );
   }
+
+  final userController = Get.find<GetUserController>();
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: backgroundColor,
         extendBodyBehindAppBar: !isMobile,
         appBar: buildAppBar(isMobile, isDesktop),
-        body: widget.user == null
+        body:userController.myUser == null
             ? const Center(child: CircularProgressIndicator())
             : CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -100,31 +104,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ? 60
                                 : 50,
                             backgroundImage:
-                            NetworkImage(widget.user!.image!),
+                            userController.myUser!.image != null ?NetworkImage(userController.myUser!.image!): AssetImage("assets/images/d37b020e87945ad7f245e48df752ed03.jpg")
                           ),
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          widget.user!.name!,
+                          userController.myUser!.name!,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: customTextColor,
                             fontWeight: FontWeight.bold,
                             fontSize: isDesktop ? 24 : 18,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          widget.user!.email!,
+                          userController.myUser!.email!,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: customTextColor,
                             fontSize: isDesktop ? 16 : 14,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          widget.user!.contact!,
+                          userController.myUser!.contact!,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: customTextColor,
                             fontSize: isDesktop ? 16 : 14,
                           ),
                         ),
@@ -135,10 +139,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
+
             // Spacer between header and content
             SliverToBoxAdapter(
               child: SizedBox(
-                  height: isDesktop ? 80 : isTablet ? 100 : 120),
+                  height: isDesktop ? 80 : isTablet ? 100 : 170),
             ),
 
             // Main Content Sliver

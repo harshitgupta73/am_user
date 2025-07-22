@@ -1,6 +1,10 @@
+import 'package:am_user/controller/user_provider/get_user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 class Auth{
+
+  final userController = Get.find<GetUserController>();
 
   Future<String?> registerWithEmailAndPassword({
     required String email,
@@ -38,6 +42,7 @@ class Auth{
           .signInWithEmailAndPassword(email: email, password: password);
 
       print("Logged in user: ${userCredential.user?.uid}");
+
       return null; // null means login was successful
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

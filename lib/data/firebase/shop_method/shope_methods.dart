@@ -10,12 +10,12 @@ class ShopMethods{
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> insertShop(ShopModal shop) async {
+  Future<void> insertShop(ShopModal shop,String id) async {
     try {
       await _firestore
           .collection(shopCollection)
-          // .doc(docId)
-          .add(shop.toJson());
+          .doc(id)
+          .set(shop.toJson());
       print('Shop inserted');
     } catch (e) {
       print('Insert failed: $e');
@@ -24,7 +24,7 @@ class ShopMethods{
 
   Future<List<ShopModal>> getAllShops() async {
     try {
-      final snapshot = await _firestore.collection('shops').get();
+      final snapshot = await _firestore.collection('Shops').get();
       List<ShopModal> shopList = snapshot.docs
           .map((doc) => ShopModal.fromJson(doc.data()))
           .toList();

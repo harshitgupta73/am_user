@@ -1,15 +1,24 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:am_user/business_categories/business_type.dart';
 import 'package:am_user/controller/image_picker_controller.dart';
 import 'package:am_user/data/firebase/storage_services/storage_service.dart';
 import 'package:am_user/data/firebase/worker_methods/worker_method.dart';
 import 'package:am_user/modals/worker_modal.dart';
 import 'package:am_user/widgets/constants/login_type.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geoflutterfire3/geoflutterfire3.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:location/location.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 import '../controller/controllers.dart';
+import '../controller/user_provider/get_user_provider.dart';
+import '../data/shareprefrance/shareprefrance.dart';
 import '../widgets/component/custom_buttom.dart';
 import '../widgets/component/custom_dropdwon.dart';
 import '../widgets/component/custom_image_container.dart';
@@ -25,28 +34,28 @@ class WorkerRegister extends StatefulWidget {
 }
 
 class _WorkerRegisterState extends State<WorkerRegister> {
-  final genderList = ['Male', 'Female', 'Other'];
-  final WorkerMethod workerMethod = WorkerMethod();
 
-  final ImagePickerController imagePickerController = Get.put(
-    ImagePickerController(),
-  );
-
+  final ImagePickerController imagePickerController = Get.find<ImagePickerController>();
   final controller = Get.put(Controller());
+  final userController = Get.find<GetUserController>();
+
+  final sharedPreferencesMethods = SharePreferencesMethods();
 
   final StorageServices storageServices = StorageServices();
+  final WorkerMethod workerMethod = WorkerMethod();
 
-  final TextEditingController workerName = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  final TextEditingController workerContact = TextEditingController();
-  final TextEditingController otherSkills = TextEditingController();
+  final genderList = ['Male', 'Female', 'Other'];
+
   Uint8List? workerImage;
+  final TextEditingController workerName = TextEditingController();
+  final TextEditingController workerContact = TextEditingController();
   String? selectedGender;
-
+  List<String> workerType=[];
+  final TextEditingController otherType = TextEditingController();
   String? stateValue;
   String? distValue;
-  String? jobWorkCategory;
-  String? jobWork;
+  final TextEditingController address = TextEditingController();
+  final TextEditingController otherSkills = TextEditingController();
 
   @override
   void dispose() {
@@ -59,6 +68,32 @@ class _WorkerRegisterState extends State<WorkerRegister> {
   }
 
   final _formKey = GlobalKey<FormState>();
+
+  late GeoFirePoint _location;
+
+  Future<void> getLocation() async{
+    Location location = Location();
+
+    // Request permission
+    PermissionStatus permissionGranted = await location.requestPermission();
+    if (permissionGranted != PermissionStatus.granted) return null;
+
+    // Get current location
+    LocationData locData = await location.getLocation();
+    double latitude = locData.latitude!;
+    double longitude = locData.longitude!;
+
+    // Create GeoFirePoint
+    GeoFirePoint myLocation = GeoFlutterFire().point(latitude: latitude, longitude: longitude);
+    _location = myLocation;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +141,7 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                       child: Obx(() {
                         return imagePickerController.imagePath.value.isNotEmpty
                             ? Image.file(
-                              File(imagePickerController.imagePath.value),
+                              File(imagePickerController.imagePath.value),height: 100,width: 100,fit: BoxFit.cover,
                             )
                             : CustomImageContainer(
                               overlay: Container(
@@ -148,36 +183,37 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                     ),
                     SizedBox(height: 10),
 
-                    CustomDropdown(
-                      items: jobCategories.keys.toList(),
-                      value: jobWorkCategory,
-                      hint: '- - Select Work Categories - - ',
-                      onChanged: (work) {
-                        jobWorkCategory = work;
-                        jobWork = null;
-                        setState(() {});
+                    MultiSelectDialogField(
+                      items: Provider().worker_type
+                          .map((e) => MultiSelectItem<String>(e, e))
+                          .toList(),
+                      title: Text("Worker Types"),
+                      buttonText: Text("Select worker Types"),
+                      searchable: true,
+                      backgroundColor: Colors.white,
+                      unselectedColor: Colors.black,
+                      chipDisplay: MultiSelectChipDisplay(
+                        chipColor: Colors.white,
+                        textStyle: TextStyle(color: Colors.black),),
+                      selectedItemsTextStyle: TextStyle(color: Colors.black),
+                      initialValue: workerType,
+                      onConfirm: (values) {
+                        setState(() {
+                          workerType = values.cast<String>();
+                        });
                       },
                     ),
 
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10,),
 
-                    jobWorkCategory == 'Other'
-                        ? CustomTextField(label: "Other")
-                        : CustomDropdown(
-                          value: jobWork,
-                          hint: ' - - Select Work - -',
-                          items:
-                              jobWorkCategory != null
-                                  ? jobCategories[jobWorkCategory]!.toList()
-                                  : [],
-                          onChanged: (value) {
-                            jobWork = value;
-                            setState(() {});
-                          },
-                        ),
-                    SizedBox(height: 10),
+                    workerType.contains("Others") ?
+                        CustomTextField(
+                          controller: otherType,
+                          label: 'Other Type',
+                          inputType: TextInputType.text,
+                        )
+                        : Container(),
 
-                    CustomTextField(controller: address, label: 'Address'),
                     SizedBox(height: 10),
 
                     CustomDropdown(
@@ -206,6 +242,9 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                         setState(() {});
                       },
                     ),
+                    SizedBox(height: 10),
+
+                    CustomTextField(controller: address, label: 'Address'),
 
                     SizedBox(height: 10),
                     CustomTextField(
@@ -232,7 +271,15 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                                 String url = await storageServices.uploadImage(
                                   file,
                                 );
+
+                                if (workerType.contains("Others") && otherType.text.trim().isNotEmpty) {
+                                  workerType.remove("Others");
+                                  workerType.add(otherType.text.trim());
+                                }
+
+                                String randomId = userController.myUser!.userId!;
                                 WorkerModal worker = WorkerModal(
+                                  workerId: randomId,
                                   workerName: workerName.text.toString(),
                                   workerContat: workerContact.text.toString(),
                                   address: address.text.toString(),
@@ -240,11 +287,16 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                                   selectedGender: selectedGender.toString(),
                                   stateValue: stateValue.toString(),
                                   distValue: distValue.toString(),
-                                  jobWorkCategory: jobWorkCategory.toString(),
-                                  jobWork: jobWork.toString(),
+                                  workType: workerType,
                                   workerImage: url,
+                                  position: _location.data,
+                                  lastUpdated: Timestamp.now(),
                                 );
-                                await workerMethod.createWorker(worker);
+                                if(randomId.isNotEmpty){
+                                  await workerMethod.createWorker(worker,randomId);
+                                }
+                                await sharedPreferencesMethods.clearUserData();
+                                await sharedPreferencesMethods.saveUserTypeAndUid("Workers", randomId);
                                 controller.stopLoading();
                                 await controller.getAllUsers();
                                 Navigator.pop(context);

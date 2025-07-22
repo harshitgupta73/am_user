@@ -4,9 +4,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/driver_modal.dart';
 import 'package:am_user/screen/ad_center/ad_account_create.dart';
 import 'package:am_user/screen/ad_center/ad_login_screen.dart';
+import 'package:am_user/screen/add_job_page.dart';
 import 'package:am_user/screen/card_deatils_csreen.dart';
 import 'package:am_user/screen/driverRegisterScreen.dart';
 import 'package:am_user/screen/login_screen.dart';
@@ -14,6 +16,7 @@ import 'package:am_user/screen/otp_screen.dart';
 import 'package:am_user/screen/serach_screen.dart';
 import 'package:am_user/screen/splash_screen.dart';
 import 'package:am_user/screen/street_list_screen.dart';
+import 'package:am_user/screen/type_dashboard_screen.dart';
 import 'package:am_user/screen/user_register_screen.dart';
 import 'package:am_user/widgets/bottom_navigation_bar/bottom_nevigation.dart';
 import 'package:am_user/widgets/common_methods.dart';
@@ -42,7 +45,6 @@ final GoRouter router = GoRouter(
 
   initialLocation:"/",
   // initialLocation:"/listScreen",
-
 
   routes: [
 
@@ -88,8 +90,15 @@ final GoRouter router = GoRouter(
     GoRoute(
       path:RoutsName.chatScreen,
       builder: (context, state) {
-        final workers = state.uri.queryParameters['data'] ;
-        return ChatScreen(data: workers);
+        final currentUserId = state.uri.queryParameters['currentUserId'] ?? '';
+        final targetUserId = state.uri.queryParameters['targetUserId'] ?? '';
+        final targetUserName = state.uri.queryParameters['targetUserName'] ?? '';
+
+        return ChatScreen(
+          currentUserId: currentUserId,
+          targetUserId: targetUserId,
+          targetUserName: targetUserName,
+        );
       },
     ),
 
@@ -103,8 +112,7 @@ final GoRouter router = GoRouter(
     GoRoute(
         path:RoutsName.profileScreen ,
         builder: (context, state) {
-          UserModal user = state.extra as UserModal;
-          return ProfileScreen(user: user );
+          return ProfileScreen();
         }
     ),
 
@@ -127,12 +135,17 @@ final GoRouter router = GoRouter(
           return DriverRegisterScreen();
         }
     ),
+    GoRoute(
+        path: RoutsName.cardDetailScreen,
+        builder: (context, state) {
+          return CardDetailsScreen(users: null);
+        }
+    ),
 
     GoRoute(
       path: "${RoutsName.loginScreen}/:loginAs",
       builder: (context, state) {
-        String loginAs = state.pathParameters['loginAs']!;
-        return LoginScreen(whoIs: loginAs);
+        return LoginScreen();
       },
     ),
 
@@ -174,10 +187,24 @@ final GoRouter router = GoRouter(
 
     ),
     GoRoute(
+      path: RoutsName.typeDashboard,
+      builder: (context, state) {
+        return TypeDashboardScreen();
+      },
+
+    ),
+    GoRoute(
+      path: RoutsName.addJob,
+      builder: (context, state) {
+        return AddJobPage();
+      },
+
+    ),
+    GoRoute(
       path: RoutsName.adLoginScreen,
       builder: (context, state) {
         // Safely extract DriverModal from state extra
-        final driver = state.extra as DriverModal?;
+        final driver = state.extra as AllUserModal?;
 
         // Ensure that driver is not null before passing to CardDetailsScreen
         if (driver == null) {
@@ -186,12 +213,9 @@ final GoRouter router = GoRouter(
           );
         }
 
-        return CardDetailsScreen(driver: driver);
+        return CardDetailsScreen(users:driver ,);
       },
     ),
-
-
-
   ],
 );
 
@@ -217,6 +241,7 @@ class RoutsName{
  static String registrationScreen = '/registrationScreen';
  static String addPostScreen = '/addPostScreen';
  static String listScreen = '/listScreen';
+ static String addJob = '/addJob';
+ static String typeDashboard='/typeDashboard';
 
 }
-

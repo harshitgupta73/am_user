@@ -31,4 +31,16 @@ class StorageServices{
       rethrow;
     }
   }
+  Future<String> uploadVideo(File file) async{
+    try{
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final ref = storage.ref().child('videos/$fileName.mp4');
+      final uploadTask =await ref.putFile(file);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+      return downloadUrl;
+    }catch(e){
+      print("Error storing pdf: $e");
+      rethrow;
+    }
+  }
 }

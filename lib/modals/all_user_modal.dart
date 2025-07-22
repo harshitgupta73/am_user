@@ -12,4 +12,14 @@ class AllUserModal {
     required this.id,
     this.image,
   });
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'contact': contact,
+      'type': type,
+      'id': id,
+      'image': image,
+    };
+  }
+
 }

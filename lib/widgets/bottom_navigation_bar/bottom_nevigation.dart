@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:go_router/go_router.dart';
 import '../../screen/dash_bord_profile_screen.dart';
+import '../../screen/registration_screen.dart';
 import '../routs/routs.dart';
 
 class CurvedNavBar extends StatefulWidget {
@@ -25,18 +26,18 @@ class _CurvedNavBarState extends State<CurvedNavBar> {
   late int _selectedIndex;
 
   late List<Widget> pages;
-  final dummyWorker = WorkerModal(
-    workerName: 'Amit Kumar',
-    address: '456 Gandhi Nagar, Delhi',
-    otherSkills: 'Plumbing, Painting',
-    selectedGender: 'Male',
-    stateValue: 'Delhi',
-    distValue: 'Central Delhi',
-    jobWorkCategory: 'Construction',
-    jobWork: 'Mason',
-    // If you don’t have an actual image, you can skip this or use a placeholder image.
-    workerImage: null, // Or use Uint8List.fromList(...) if you have image bytes
-  );
+  // final dummyWorker = WorkerModal(
+  //   workerName: 'Amit Kumar',
+  //   address: '456 Gandhi Nagar, Delhi',
+  //   otherSkills: 'Plumbing, Painting',
+  //   selectedGender: 'Male',
+  //   stateValue: 'Delhi',
+  //   distValue: 'Central Delhi',
+  //   jobWorkCategory: 'Construction',
+  //   jobWork: 'Mason',
+  //   // If you don’t have an actual image, you can skip this or use a placeholder image.
+  //   workerImage: null, // Or use Uint8List.fromList(...) if you have image bytes
+  // );
 
 
    List<WorkerModal> workers = [];
@@ -55,7 +56,7 @@ class _CurvedNavBarState extends State<CurvedNavBar> {
     tabIcon(Icons.search),
     tabIcon(Icons.chat),
     tabIcon(Icons.info_outline),
-    tabIcon(Icons.notifications),
+    tabIcon(Icons.edit),
   ];
 
   static Widget tabIcon(IconData icon) {
@@ -65,14 +66,14 @@ class _CurvedNavBarState extends State<CurvedNavBar> {
   @override
   void initState() {
     super.initState();
-    workers = List.generate(10, (index) => dummyWorker,);
+    // workers = List.generate(10, (index) => dummyWorker,);
     _selectedIndex = widget.currentIndex;
     pages = [
       HomeScreen(),
       SearchScreen(),
       ChatListScreen(),
       JobSearchScreen(),
-      ChatListScreen(),
+      RegistrationScreen(),
 
     ];
   }

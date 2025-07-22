@@ -1,8 +1,16 @@
-import 'package:am_user/widgets/component/searchBar.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
 
+import 'package:am_user/controller/image_picker_controller.dart';
+import 'package:am_user/controller/job_controller/job_controller.dart';
+import 'package:am_user/data/firebase/storage_services/storage_service.dart';
+import 'package:am_user/widgets/component/job_list_card.dart';
+import 'package:am_user/widgets/constants/const.dart';
+import 'package:am_user/widgets/routs/routs.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import '../modals/worker_modal.dart';
-import '../widgets/component/list_deatils_card_for_web.dart';
 
 class JobSearchScreen extends StatefulWidget {
   @override
@@ -10,97 +18,83 @@ class JobSearchScreen extends StatefulWidget {
 }
 
 class _JobSearchScreenState extends State<JobSearchScreen> {
-  List<WorkerModal> _filteredItems = [];
-  final TextEditingController _searchController = TextEditingController();
 
-  static List<WorkerModal> allWorkers = [];
+  final imagePickerController = Get.find<ImagePickerController>();
+  final jobController = Get.find<JobController>();
+
+  final StorageServices storageServices = StorageServices();
 
   @override
   void initState() {
     super.initState();
-    allWorkers = List.generate(20, (index) => WorkerModal(
-      workerName: 'Amit Kumar $index',
-      address: 'Address $index, Delhi',
-      otherSkills: 'Plumbing, Painting',
-      workerContat: '6320185485',
-      selectedGender: 'Male',
-      stateValue: 'Delhi',
-      distValue: 'Central Delhi',
-      jobWorkCategory: 'Construction',
-      jobWork: 'Mason',
-      workerImage: null,
-    ),);
-    _searchController.addListener(_onSearchChanged);
+    jobController.loadJobs();
   }
 
-  void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredItems = allWorkers.where((item) {
-        return item.workerName!.toLowerCase().contains(query) ||
-            item.otherSkills!.split(',').any((skill) => skill.toLowerCase().contains(query));
-      }).toList();
-    });
-  }
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black, // status bar background
+        statusBarIconBrightness: Brightness.dark, // icons: time, battery
+      ),
+    );
     return Scaffold(
-      backgroundColor: Colors.black,  // always dark
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          "Search",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text("Information",style: TextStyle(color: Colors.black),),
         centerTitle: true,
+        backgroundColor: backgroundColor,
         iconTheme: IconThemeData(
-          color: Colors.white,
+          color: Colors.black, // Change this to your desired color
         ),
-        elevation: 0,
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: CustomSearchbar(
-              controller: _searchController,
-              label: "Search here",
-              // if your CustomSearchbar supports colors, you can pass backgroundColor and textColor also
-            ),
-          ),
+          const SizedBox(height: 15,),
           Expanded(
-            child: _filteredItems.isEmpty
-                ? Center(
-              child: Text(
-                "No Search Results",
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-                : ListView.builder(
-              itemCount: _filteredItems.length,
-              itemBuilder: (ctx, index) {
-                final item = _filteredItems[index];
-                return ListDetailsCardForWeb(
-                  work: item.otherSkills!,
-                  image: item.workerImage,
-                  name: item.workerName,
-                  contact: item.workerContat,
+            child: Obx(() {
+              if (jobController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator(color: Colors.white));
+              }
+
+              if (jobController.jobs.isEmpty) {
+                return Center(
+                  child: Text(
+                    jobController.errorMessage.value.isNotEmpty
+                        ? jobController.errorMessage.value
+                        : "No Search Results",
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 );
-              },
-            ),
+              }
+
+              return ListView.builder(
+                itemCount: jobController.jobs.length,
+                itemBuilder: (ctx, index) {
+                  final item = jobController.jobs[index];
+                  return JobListCard(item: item);
+                },
+              );
+            }),
+
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        child: Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          context.go(RoutsName.addJob);
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
+
 }
