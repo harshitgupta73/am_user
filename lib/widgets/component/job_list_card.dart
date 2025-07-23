@@ -1,7 +1,15 @@
+import 'dart:io';
+
 import 'package:am_user/modals/job_model.dart';
 import 'package:am_user/widgets/component/reel_conatiner.dart';
+import 'package:am_user/widgets/component/video_player_page.dart';
+import 'package:am_user/widgets/component/video_player_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:video_compress/video_compress.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../responsive/reponsive_layout.dart';
 
@@ -15,18 +23,15 @@ class JobListCard extends StatefulWidget {
 }
 
 class _JobListCardState extends State<JobListCard> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
 
-  @override
   Widget build(BuildContext context) {
+
+    final Timestamp timestamp = widget.item.createdAt!;
+    final DateTime dateTime = timestamp.toDate();
+    final String formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+
     double screenWidth = MediaQuery.of(context).size.width;
     double imageHeight;
 
@@ -63,7 +68,6 @@ class _JobListCardState extends State<JobListCard> {
                 child: Image.network(
                   widget.item.images!,
                   width: double.infinity,
-                  height: imageHeight,
                   fit: BoxFit.cover,
                   errorBuilder:
                       (_, __, ___) => Container(
@@ -78,42 +82,38 @@ class _JobListCardState extends State<JobListCard> {
               ),
 
             if (widget.item.video != null && widget.item.video!.isNotEmpty)
-              Container(
-                height: imageHeight,
-                color: Colors.black54,
-                child: Center(
-                  child: Icon(
-                    Icons.play_circle_fill,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                ),
-              ),
+              InlineVideoPlayer(videoUrl: widget.item.video!,height: imageHeight,),
 
             // TEXT overlay (if available)
             if (widget.item.name != null && widget.item.name!.isNotEmpty)
-              Positioned(
-                left: 10,
-                bottom: 10,
-                child: AutoSizeText(
-                  widget.item.name!,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: Responsive.isMobile(context) ? 21 : 40,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withOpacity(0.7),
-                        offset: Offset(2, 2),
-                        blurRadius: 4,
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    AutoSizeText(
+                      widget.item.name!,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.isMobile(context) ? 21 : 40,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.7),
+                            offset: Offset(2, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  minFontSize: 10,
-                  maxFontSize: 40,
-                  maxLines: 1,
+                      minFontSize: 10,
+                      maxFontSize: 40,
+                      maxLines: 1,
+                    ),
+
+
+                  ],
                 ),
               ),
-            const SizedBox(height: 10,)
+            const SizedBox(height: 10,),
+            Text(formattedDate,style: TextStyle(color: Colors.white),)
           ],
         ),
       ),

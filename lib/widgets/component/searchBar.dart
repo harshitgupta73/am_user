@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
 import '../constants/const.dart';
 
@@ -11,7 +12,6 @@ class CustomSearchbar extends StatefulWidget {
     required this.controller,
     this.label,
     this.onTap,
-
   });
 
   @override

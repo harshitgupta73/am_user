@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:am_user/controller/ad_controller/ad_controller.dart';
 import 'package:am_user/controller/controllers.dart';
 import 'package:am_user/controller/job_controller/job_controller.dart';
 import 'package:am_user/controller/media_controllers/media_controller.dart';
@@ -25,6 +26,7 @@ void main() async {
   Get.put(ChatController());
   Get.put(ImagePickerController());
   Get.put(JobController());
+  Get.put(AdController());
 
   if(kIsWeb) {
     final controller = Get.find<Controller>();
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return GetMaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Am User',
       theme: ThemeData.dark().copyWith(
@@ -52,7 +54,10 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.black,
       ),
-      routerConfig: router,
+      // routerConfig: router,
+      routerDelegate: router.routerDelegate,
+      routeInformationParser: router.routeInformationParser,
+      routeInformationProvider: router.routeInformationProvider,
     );
   }
 }

@@ -28,8 +28,16 @@ class Controller extends GetxController {
 
   final currDistrict = "".obs;
 
-  void startLoading() => isLoading.value = true;
+  RxString option=''.obs;
+  RxString selectedCategory=''.obs;
+  RxString selectedSubCategory=''.obs;
+  RxString selectedWorkerType= ''.obs;
 
+  RxList<ShopModal> shopList = <ShopModal>[].obs;
+  RxList<WorkerModal> workerList = <WorkerModal>[].obs;
+  RxList<DriverModal> driverList = <DriverModal>[].obs;
+
+  void startLoading() => isLoading.value = true;
   void stopLoading() => isLoading.value = false;
 
   @override
@@ -40,8 +48,9 @@ class Controller extends GetxController {
     getAllDrivers();
     getAllWorkers();
     getAllUsers();
-    print("user ");
-    // getCurrentDistrict().then((_) => getAllUsers());
+    fetchDataBasedOnSelection();
+
+    print("user");
   }
 
   Future<void> getAllShops() async {
@@ -319,6 +328,92 @@ class Controller extends GetxController {
       print("Error in geohash query: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> filterDataBasedOnSelection() async {
+    print("object");
+    if (option.value == "Shops") {
+      print("djvdh");
+      // Filter shops by category and subcategory
+      final filtered = shops.where((shop) {
+        final hasCategory = shop.shopCategorySet?.contains(selectedCategory.value) ?? false;
+        final hasSubcategory = shop.shopSubcategoryMap?[selectedCategory.value]
+            ?.contains(selectedSubCategory.value) ?? false;
+        return hasCategory && hasSubcategory;
+      }).toList();
+
+      shopList.value = filtered;
+      print("djhb= ${shopList[0].days}");
+    }
+
+    else if (option.value == "Workers") {
+      // Filter workers by selected work types
+      final filtered = workers.where((worker) {
+        return worker.workType?.contains(selectedWorkerType.value) ?? false;
+      }).toList();
+
+      workerList.value = filtered;
+    }
+
+    else if (option.value == "drivers") {
+      // Just assign all drivers
+      driverList.value = drivers;
+    }
+  }
+
+  Future<void> fetchDataBasedOnSelection() async {
+    if (option.value == "Shops") {
+      // Fetch shops matching category and subcategory
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Shops')
+          .where('shopCategorySet', arrayContains: selectedCategory.value)
+          .get();
+
+      shops.value = snapshot.docs
+          .map((doc) => ShopModal.fromJson(doc.data()))
+          .toList();
+
+      // Filter subcategory manually
+      List<ShopModal> filteredShops = shops.where((shop) {
+        final subMap = shop.shopSubcategoryMap;
+        if (subMap != null && subMap.containsKey(selectedCategory.value)) {
+          return subMap[selectedCategory.value]!
+              .contains(selectedSubCategory.value);
+        }
+        return false;
+      }).toList();
+
+      shopList.value = filteredShops;
+      print("dkhvd= ${shopList.length}");
+    }
+
+    else if (option.value == "Workers") {
+      // Fetch workers matching selected types
+
+        final snapshot = await FirebaseFirestore.instance
+            .collection('Workers')
+            .where('workType', arrayContains: selectedWorkerType.value)
+            .get();
+
+        List<WorkerModal> workers = snapshot.docs
+            .map((doc) => WorkerModal.fromJson(doc.data()))
+            .toList();
+
+        workerList.value = workers;
+    }
+
+    else if (option.value == "drivers") {
+      // Fetch all drivers
+      final snapshot = await FirebaseFirestore.instance
+          .collection('drivers')
+          .get();
+
+      List<DriverModal> drivers = snapshot.docs
+          .map((doc) => DriverModal.fromJson(doc.data()))
+          .toList();
+
+      driverList.value = drivers;
     }
   }
 }

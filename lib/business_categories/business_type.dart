@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Provider {
   final List<String> business_type = [
     "Individual Professional",
@@ -34,6 +32,9 @@ class Provider {
       "Home Rent",
       "Shopping Mall",
       "Cable TV Operators & DTH Services",
+      "Newspaper distributors",
+      "Hawker( Pheri wala)",
+      "CSC Centre & photocopy store"
     ],
     "Electronics, Kitchen & Home Appliances": [
       "Electronics Shops & Dealers",
@@ -308,6 +309,7 @@ class Provider {
       "ENT (Ear, Nose & Throat) Specialists",
       "Psychiatrists & Psychologists",
       "Speech Therapy & Hearing Clinics",
+      "Artificial limb centre"
     ],
     "Health, Fitness & Sports": [
       "Gyms & Fitness Centres",
@@ -316,6 +318,7 @@ class Provider {
       "Yoga & Meditation Classes",
     ],
     "Business Needs & Supplies": [
+      "Disposable Items manufacturers & supplies"
       "Construction Material Suppliers",
       "Legal Documents & Licenses",
       "Packing & Packaging Materials Suppliers",
@@ -324,15 +327,19 @@ class Provider {
       "Raw Material Suppliers",
       "Machine and Equipment Suppliers",
       "Machine and Equipment Manufacturers",
+      "Autoparts manufacturers & suppliers",
       "Wholesale Goods Traders & Suppliers",
       "Acids & Chemicals Suppliers",
       "Acids & Chemicals Manufacturers",
       "Oxygen and Medical Equipment Suppliers",
+      "Artificial limb equipment manufacturers & suppliers",
       "Oxygen and Medical Equipment Manufacturers",
       "Plumbing Items Manufacturers & Suppliers",
       "Electrical Items Manufacturers & Suppliers",
       "Cosmetic Items Manufacturers & Suppliers",
+      "Paint manufacturers & suppliers",
       "PVC Items Manufacturers & Suppliers",
+      "Leather items manufacturers & suppliers",
       "Toy Manufacturers & Suppliers",
       "Hosiery and Garments Manufacturers & Suppliers",
       "Electronic Items Manufacturers & Suppliers",

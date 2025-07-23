@@ -23,6 +23,8 @@ class GetUserController extends GetxController {
   final Rxn<UserModal> _userModal = Rxn<UserModal>();
   UserModal? get myUser => _userModal.value;
 
+  Rxn<UserModal> otherUser = Rxn<UserModal>();
+
   @override
   void onInit() {
     super.onInit();
@@ -39,6 +41,22 @@ class GetUserController extends GetxController {
       UserModal? user = await userMethod.getUserById(userId);
       if (user != null) {
         _userModal.value = user;
+      }
+    } catch (e) {
+      print("Error fetching user: $e");
+    }
+    finally{
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> getUserById(String id) async{
+    try {
+      isLoading.value = true;
+
+      UserModal? user = await userMethod.getUserById(id);
+      if (user != null) {
+        otherUser.value = user;
       }
     } catch (e) {
       print("Error fetching user: $e");

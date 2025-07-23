@@ -35,11 +35,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
   bool isVideo = false;
   bool isPost = true;
 
-  // Dummy data for videos & posts
-  final List<String> videos = [
-    'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-    'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
-  ];
+  // Dummy data for videos & post
 
   final List<String> postImages = [
     'https://picsum.photos/id/1015/200/200',
@@ -74,11 +70,12 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
     } else if (d.type == "Shop") {
       shop = controller.shops.firstWhereOrNull((e) => e.shopId == d.id);
     }
+    userController.getUserById(widget.users!.id);
   }
 
   Future<void> _initializeAndPlay(int index) async {
     _disposeActiveController();
-    final url = videos[index];
+    final url = userController.otherUser.value!.videos![index];
     final controller = VideoPlayerController.network(url);
     try {
       await controller.initialize();
@@ -283,7 +280,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                       //   targetUserId: targetUserId,
                       //   targetUserName: targetUserName,
                       // ));
-                      context.go(
+                      context.push(
                         '${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=${d.id}&targetUserName=${Uri.encodeComponent(d.name)}',
                       );
                     },
@@ -362,7 +359,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
             // Show Posts or Videos
             isVideo
                 ? Column(
-                  children: List.generate(videos.length, (index) {
+                  children: List.generate(userController.otherUser.value!.videos!.length, (index) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: _buildVideoCard(index),
@@ -372,7 +369,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 : GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: postImages.length,
+                  itemCount: userController.otherUser.value!.images!.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 8,
@@ -382,7 +379,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
-                        postImages[index],
+                        userController.otherUser.value!.images![index],
                         fit: BoxFit.cover,
                       ),
                     );

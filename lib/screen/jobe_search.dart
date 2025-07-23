@@ -90,7 +90,7 @@ class _JobSearchScreenState extends State<JobSearchScreen> {
         backgroundColor: Colors.blue,
         child: Icon(Icons.add, color: Colors.white),
         onPressed: () {
-          context.go(RoutsName.addJob);
+          context.push(RoutsName.addJob);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

@@ -47,7 +47,8 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
 
   final StorageServices storageServices = StorageServices();
 
-  final controller = Get.put(Controller());
+  final controller = Get.find<Controller>();
+  bool isEditing = false;
 
   String? vehicleRcImage;
   String? driverImage;
@@ -88,6 +89,26 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
     // TODO: implement initState
     super.initState();
     getLocation();
+    if(userController.driverModal.value != null){
+      setState(() {
+        isEditing= true;
+      });
+      driverImage = userController.driverModal.value!.driverImage;
+      driverName.text = userController.driverModal.value!.driverName!;
+      driverContact.text = userController.driverModal.value!.driverContact!;
+      driverLicenceNo.text = userController.driverModal.value!.driverLicenceNo!;
+      drivingLicence = userController.driverModal.value!.drivingLicence!;
+
+      vehicleNo.text = userController.driverModal.value!.vehicleNo!;
+      vehicleName.text = userController.driverModal.value!.vehicleName!;
+      vehicleOwnerName.text = userController.driverModal.value!.vehicleOwnerName!;
+      vehicleRcImage = userController.driverModal.value!.vehicleRcImage!;
+
+      driverAddress.text = userController.driverModal.value!.driverAddress!;
+      driverOtherSkill.text = userController.driverModal.value!.driverOtherSkill!;
+      stateValue = userController.driverModal.value!.stateValue!;
+      distValue = userController.driverModal.value!.distValue!;
+    }
   }
 
   @override
@@ -136,25 +157,43 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                         });
                       },
                       child: Obx(() {
-                        return imagePickerController.imagePath.value.isNotEmpty
-                            ? Image.file(File(driverImage!),height: 100,width: 100,fit: BoxFit.cover,)
-                            : CustomImageContainer(
-                              overlay: Container(
-                                alignment: Alignment.bottomCenter,
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.7),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
+                        final pickedImage = imagePickerController.imagePath.value;
+
+                        if (pickedImage.isNotEmpty && File(pickedImage).existsSync()) {
+                          // Show selected local image
+                          return Image.file(
+                            File(pickedImage),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          );
+                        } else if (driverImage != null && driverImage!.startsWith("http")) {
+                          // Show existing Firebase image
+                          return Image.network(
+                            driverImage!,
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
+                          );
+                        } else {
+                          // Show placeholder
+                          return CustomImageContainer(
+                            overlay: Container(
+                              alignment: Alignment.bottomCenter,
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.7),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
                                 ),
                               ),
-                            );
-                      }),
+                            ),
+                          );}})
                     ),
                     SizedBox(height: 20),
                     CustomTextField(
@@ -265,7 +304,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : CustomButton(
                             backgroundColor: backgroundColor,
-                            label: "Register",
+                            label:isEditing ? "Update" : "Register",
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 controller.startLoading();
@@ -324,24 +363,27 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
 
 
                                   // print(randomId);
-                                  if(randomId.isNotEmpty){
-                                    await driverMethods.insertDriver(driver,randomId);
+                                  if (isEditing) {
+                                    await driverMethods.updateDriver(driver, randomId);
+                                  } else {
+                                    await driverMethods.insertDriver(driver, randomId);
+                                    await sharedPreferencesMethods.clearUserData();
+                                    await sharedPreferencesMethods.saveUserTypeAndUid("drivers", randomId);
                                   }
-                                  await sharedPreferencesMethods.clearUserData();
-                                  await sharedPreferencesMethods.saveUserTypeAndUid("drivers", randomId);
                                   controller.stopLoading();
-                                  Navigator.pop(context);
-                                  await controller.getAllUsers();
+
+                                  if(!isEditing) await controller.getAllUsers();
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'Driver added successfully',
+                                        isEditing ? 'Driver updated successfully' : 'Driver added successfully',
                                       ),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
                                   imagePickerController.imagePath.value = "";
+                                  isEditing== true ? context.go(RoutsName.typeDashboard) : Navigator.pop(context);
                                 } catch (e) {
                                   Get.snackbar(
                                     "Error",

@@ -203,7 +203,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       ),
                       onTap: () {
                         // Mark as read when tapped
-                        context.go('${RoutsName.chatScreen}?currentUserId=${userController
+                        context.push('${RoutsName.chatScreen}?currentUserId=${userController
                             .myUser!.userId!}&targetUserId=${otherUserId}&targetUserName=${Uri.encodeComponent(otherUser.name)}');
                       },
                     ),

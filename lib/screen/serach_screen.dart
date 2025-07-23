@@ -1,13 +1,11 @@
 import 'package:am_user/screen/card_deatils_csreen.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:am_user/widgets/component/searchBar.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import '../controller/controllers.dart';
-import '../modals/worker_modal.dart';
+import '../controller/searchController/search_controller.dart';
 import '../responsive/reponsive_layout.dart';
 import '../widgets/component/list_deatils_card_for_web.dart';
 
@@ -17,29 +15,19 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<WorkerModal> _filteredItems = [];
+  // List<WorkerModal> _filteredItems = [];
   final TextEditingController _searchController = TextEditingController();
   final controller =Get.find<Controller>();
+  final SearchController searchController = Get.put(SearchController());
 
-  late List<WorkerModal> allWorkers;
+  // late List<WorkerModal> allWorkers;
 
   @override
   void initState() {
     super.initState();
-    // Generate 20 dummy workers with unique data
-    allWorkers = List.generate(20, (index) => WorkerModal(
-      workerName: 'Amit Kumar $index',
-      address: 'Address $index, Delhi',
-      otherSkills: 'Plumbing, Painting',
-      selectedGender: 'Male',
-      stateValue: 'Delhi',
-      distValue: 'Central Delhi',
-      workType: ['Plumbing', 'Painting'],
-      workerImage: null,
-    ));
 
-    _filteredItems = allWorkers;
-    // _searchController.addListener(_onSearchChanged);
+    // _filteredItems = allWorkers;
+    // _searchController.addListener();
   }
 
   // void _onSearchChanged() {
@@ -76,63 +64,181 @@ class _SearchScreenState extends State<SearchScreen> {
           const SizedBox(height: 30,),
           Padding(
             padding: const EdgeInsets.all(10.0),
-            child: CustomSearchbar(
-              controller: _searchController,
-              label: "Search here",
-            ),
-          ),
-          Expanded(
-            child: _filteredItems.isEmpty
-                ? const Center(
-              child: Text(
-                "No Search Results",
-                style: TextStyle(color: Colors.white),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black,width: 1),
+                borderRadius: BorderRadius.circular(12)
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(21),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: "Search",
+                  hintStyle: TextStyle(color: Colors.black),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      final query = _searchController.text.trim().toLowerCase();
+                      if (query.isNotEmpty) {
+                        searchController.runSearch(query);
+                      }
+                    },
+                    child: Icon(Icons.search, color: Colors.black),
+                  ),
+                ),
+                cursorColor: Colors.black,
+                controller: _searchController,
+                  onChanged: (value) {
+                    final query = value.trim().toLowerCase();
+                    if (query.isEmpty) {
+                      searchController.allResults.clear();
+                    } else {
+                      searchController.runSearch(query);
+                    }
+                },
               ),
             )
-                : GridView.builder(
+          ),
+          // Expanded(
+          //   child: searchController.allResults.isNotEmpty
+          //       ? GridView.builder(
+          //     physics: const NeverScrollableScrollPhysics(),
+          //     itemCount: searchController.allResults.length,
+          //     shrinkWrap: true,
+          //     padding: Responsive.isMobile(context)
+          //         ? EdgeInsets.zero
+          //         : EdgeInsets.all(20),
+          //     gridDelegate:
+          //     SliverGridDelegateWithFixedCrossAxisCount(
+          //       crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
+          //       crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+          //       mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+          //       childAspectRatio:
+          //       Responsive.isDesktop(context)
+          //           ? 20 / 5
+          //           : Responsive.isMobile(context)
+          //           ? 14 / 5
+          //           : 15 / 5,
+          //     ),
+          //     itemBuilder: (context, index) {
+          //       final users = searchController.allResults[index];
+          //       return InkWell(
+          //         onTap: () {
+          //           if (kIsWeb) {
+          //             // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
+          //           } else {
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(
+          //                 builder: (context) => CardDetailsScreen(users:AllUserModal(name: users.name, contact: users.contact, type: users.type, id: users.id, image: users.image,)),
+          //               ),
+          //             );
+          //           }
+          //         },
+          //         child: ListDetailsCardForWeb(
+          //             name: users.name,
+          //             contact: users.contact,
+          //             work: users.type,
+          //             image: users.image,
+          //           id: users.id,
+          //         ),
+          //       );
+          //     },
+          //   )
+          //       : GridView.builder(
+          //     physics: const NeverScrollableScrollPhysics(),
+          //     itemCount: controller.allUsers.length,
+          //     shrinkWrap: true,
+          //     padding: Responsive.isMobile(context)
+          //         ? EdgeInsets.zero
+          //         : EdgeInsets.all(20),
+          //     gridDelegate:
+          //     SliverGridDelegateWithFixedCrossAxisCount(
+          //       crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
+          //       crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+          //       mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+          //       childAspectRatio:
+          //       Responsive.isDesktop(context)
+          //           ? 20 / 5
+          //           : Responsive.isMobile(context)
+          //           ? 14 / 5
+          //           : 15 / 5,
+          //     ),
+          //     itemBuilder: (context, index) {
+          //       final users = controller.allUsers[index];
+          //       return InkWell(
+          //         onTap: () {
+          //           if (kIsWeb) {
+          //             // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
+          //           } else {
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(
+          //                 builder: (context) => CardDetailsScreen(users:users),
+          //               ),
+          //             );
+          //           }
+          //         },
+          //         child: ListDetailsCardForWeb(
+          //           id:users.id,
+          //           work: users.type,
+          //           image: users.image,
+          //           name: users.name,
+          //           contact: users.contact,
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
+          Expanded(
+            child: Obx(() => GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.allUsers.length,
+              itemCount: searchController.allResults.isNotEmpty
+                  ? searchController.allResults.length
+                  : controller.allUsers.length,
               shrinkWrap: true,
               padding: Responsive.isMobile(context)
                   ? EdgeInsets.zero
                   : EdgeInsets.all(20),
-              gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
                 crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
                 mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-                childAspectRatio:
-                Responsive.isDesktop(context)
+                childAspectRatio: Responsive.isDesktop(context)
                     ? 20 / 5
                     : Responsive.isMobile(context)
                     ? 14 / 5
                     : 15 / 5,
               ),
               itemBuilder: (context, index) {
-                final users = controller.allUsers[index];
+                final users = searchController.allResults.isNotEmpty
+                    ? searchController.allResults[index]
+                    : controller.allUsers[index];
+
                 return InkWell(
                   onTap: () {
                     if (kIsWeb) {
-                      // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
+                      // Web routing if needed
                     } else {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CardDetailsScreen(users:users),
+                          builder: (context) => CardDetailsScreen(users: users),
                         ),
                       );
                     }
                   },
                   child: ListDetailsCardForWeb(
-                    id:users.id,
-                    work: users.type,
-                    image: users.image,
+                    id: users.id,
                     name: users.name,
                     contact: users.contact,
+                    work: users.type,
+                    image: users.image,
                   ),
                 );
               },
-            ),
+            )),
           ),
         ],
       ),

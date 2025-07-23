@@ -13,6 +13,7 @@ import 'package:am_user/screen/card_deatils_csreen.dart';
 import 'package:am_user/screen/driverRegisterScreen.dart';
 import 'package:am_user/screen/login_screen.dart';
 import 'package:am_user/screen/otp_screen.dart';
+import 'package:am_user/screen/selected_user_screen.dart';
 import 'package:am_user/screen/serach_screen.dart';
 import 'package:am_user/screen/splash_screen.dart';
 import 'package:am_user/screen/street_list_screen.dart';
@@ -138,7 +139,8 @@ final GoRouter router = GoRouter(
     GoRoute(
         path: RoutsName.cardDetailScreen,
         builder: (context, state) {
-          return CardDetailsScreen(users: null);
+          final user = state.extra as AllUserModal?;
+          return CardDetailsScreen(users: user);
         }
     ),
 
@@ -201,6 +203,13 @@ final GoRouter router = GoRouter(
 
     ),
     GoRoute(
+      path: RoutsName.selectedUsers,
+      builder: (context, state) {
+        return SelectedUserScreen();
+      },
+
+    ),
+    GoRoute(
       path: RoutsName.adLoginScreen,
       builder: (context, state) {
         // Safely extract DriverModal from state extra
@@ -243,5 +252,6 @@ class RoutsName{
  static String listScreen = '/listScreen';
  static String addJob = '/addJob';
  static String typeDashboard='/typeDashboard';
+ static String selectedUsers='/selectedUsers';
 
 }

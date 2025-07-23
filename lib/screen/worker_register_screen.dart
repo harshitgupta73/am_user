@@ -36,17 +36,15 @@ class WorkerRegister extends StatefulWidget {
 class _WorkerRegisterState extends State<WorkerRegister> {
 
   final ImagePickerController imagePickerController = Get.find<ImagePickerController>();
-  final controller = Get.put(Controller());
+  final controller = Get.find<Controller>();
   final userController = Get.find<GetUserController>();
-
   final sharedPreferencesMethods = SharePreferencesMethods();
-
   final StorageServices storageServices = StorageServices();
   final WorkerMethod workerMethod = WorkerMethod();
 
   final genderList = ['Male', 'Female', 'Other'];
 
-  Uint8List? workerImage;
+  String? workerImage;
   final TextEditingController workerName = TextEditingController();
   final TextEditingController workerContact = TextEditingController();
   String? selectedGender;
@@ -87,12 +85,27 @@ class _WorkerRegisterState extends State<WorkerRegister> {
     GeoFirePoint myLocation = GeoFlutterFire().point(latitude: latitude, longitude: longitude);
     _location = myLocation;
   }
+  bool isEditing = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getLocation();
+    if(userController.workerModal.value != null){
+      setState(() {
+        isEditing = true;
+      });
+      workerImage = userController.workerModal.value!.workerImage;
+      workerName.text = userController.workerModal.value!.workerName!;
+      workerContact.text = userController.workerModal.value!.workerContat!;
+      selectedGender = userController.workerModal.value!.selectedGender!;
+      address.text = userController.workerModal.value!.address!;
+      otherSkills.text = userController.workerModal.value!.otherSkills!;
+      stateValue = userController.workerModal.value!.stateValue!;
+      distValue = userController.workerModal.value!.distValue!;
+      workerType = userController.workerModal.value!.workType!;
+    }
   }
 
   @override
@@ -139,26 +152,40 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                         imagePickerController.getImage();
                       },
                       child: Obx(() {
-                        return imagePickerController.imagePath.value.isNotEmpty
-                            ? Image.file(
-                              File(imagePickerController.imagePath.value),height: 100,width: 100,fit: BoxFit.cover,
-                            )
-                            : CustomImageContainer(
-                              overlay: Container(
-                                alignment: Alignment.bottomCenter,
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.7),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
+                        final pickedImage = imagePickerController.imagePath.value;
+                        if(pickedImage.isNotEmpty){
+                          return Image.file(
+                            File(pickedImage),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          );
+                        }else if(workerImage!.isNotEmpty){
+                          return Image(
+                            image: NetworkImage(workerImage!),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          );
+                        }
+                        else{
+                          return CustomImageContainer(
+                            overlay: Container(
+                              alignment: Alignment.bottomCenter,
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.7),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
                                 ),
                               ),
-                            );
+                            ),
+                          );
+                        }
                       }),
                     ),
                     SizedBox(height: 20),
@@ -255,63 +282,140 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                     Obx(() {
                       return controller.isLoading.value
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : CustomButton(
-                            backgroundColor: backgroundColor,
-                            label: "Register",
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate() &&
-                                  imagePickerController
-                                      .imagePath
-                                      .value
-                                      .isNotEmpty) {
-                                controller.startLoading();
-                                File file = File(
-                                  imagePickerController.imagePath.value,
-                                );
-                                String url = await storageServices.uploadImage(
-                                  file,
-                                );
+                          // : CustomButton(
+                          //   backgroundColor: backgroundColor,
+                          //   label:isEditing ? "Upload" : "Register",
+                          //   onPressed: () async {
+                          //     if (_formKey.currentState!.validate() ) {
+                          //       controller.startLoading();
+                          //       File file = File(
+                          //         imagePickerController.imagePath.value,
+                          //       );
+                          //       String url = await storageServices.uploadImage(
+                          //         file,
+                          //       );
+                          //
+                          //       if (workerType.contains("Others") && otherType.text.trim().isNotEmpty) {
+                          //         workerType.remove("Others");
+                          //         workerType.add(otherType.text.trim());
+                          //       }
+                          //
+                          //       String randomId = userController.myUser!.userId!;
+                          //       WorkerModal worker = WorkerModal(
+                          //         workerId: randomId,
+                          //         workerName: workerName.text.toString(),
+                          //         workerContat: workerContact.text.toString(),
+                          //         address: address.text.toString(),
+                          //         otherSkills: otherSkills.text.toString(),
+                          //         selectedGender: selectedGender.toString(),
+                          //         stateValue: stateValue.toString(),
+                          //         distValue: distValue.toString(),
+                          //         workType: workerType,
+                          //         workerImage: url,
+                          //         position: _location.data,
+                          //         lastUpdated: Timestamp.now(),
+                          //       );
+                          //       if(randomId.isNotEmpty){
+                          //         await workerMethod.createWorker(worker,randomId);
+                          //       }
+                          //       await sharedPreferencesMethods.clearUserData();
+                          //       await sharedPreferencesMethods.saveUserTypeAndUid("Workers", randomId);
+                          //       controller.stopLoading();
+                          //       await controller.getAllUsers();
+                          //       Navigator.pop(context);
+                          //
+                          //       ScaffoldMessenger.of(context).showSnackBar(
+                          //         SnackBar(
+                          //           content: Text('Worker added successfully'),
+                          //           backgroundColor: Colors.green,
+                          //         ),
+                          //       );
+                          //
+                          //       imagePickerController.imagePath.value = '';
+                          //     }
+                          //   },
+                          // );
+                      :CustomButton(
+                        backgroundColor: backgroundColor,
+                        label: isEditing ? "Update" : "Register",
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            controller.startLoading();
 
-                                if (workerType.contains("Others") && otherType.text.trim().isNotEmpty) {
-                                  workerType.remove("Others");
-                                  workerType.add(otherType.text.trim());
+                            try {
+                              String imagePath = imagePickerController.imagePath.value;
+                              String uploadedImageUrl = imagePath;
+
+                              if (!imagePath.startsWith("http")) {
+                                // Upload image only if it's a local file (new image selected)
+                                if (imagePath.isEmpty) {
+                                  Get.snackbar(
+                                    "Missing Image",
+                                    "Please upload a worker image",
+                                    backgroundColor: Colors.red,
+                                  );
+                                  controller.stopLoading();
+                                  return;
                                 }
 
-                                String randomId = userController.myUser!.userId!;
-                                WorkerModal worker = WorkerModal(
-                                  workerId: randomId,
-                                  workerName: workerName.text.toString(),
-                                  workerContat: workerContact.text.toString(),
-                                  address: address.text.toString(),
-                                  otherSkills: otherSkills.text.toString(),
-                                  selectedGender: selectedGender.toString(),
-                                  stateValue: stateValue.toString(),
-                                  distValue: distValue.toString(),
-                                  workType: workerType,
-                                  workerImage: url,
-                                  position: _location.data,
-                                  lastUpdated: Timestamp.now(),
-                                );
-                                if(randomId.isNotEmpty){
-                                  await workerMethod.createWorker(worker,randomId);
-                                }
-                                await sharedPreferencesMethods.clearUserData();
-                                await sharedPreferencesMethods.saveUserTypeAndUid("Workers", randomId);
-                                controller.stopLoading();
-                                await controller.getAllUsers();
-                                Navigator.pop(context);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Worker added successfully'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-
-                                imagePickerController.imagePath.value = '';
+                                File file = File(imagePath);
+                                uploadedImageUrl = await storageServices.uploadImage(file);
                               }
-                            },
-                          );
+
+                              // Replace "Others" if user has entered a custom skill
+                              if (workerType.contains("Others") && otherType.text.trim().isNotEmpty) {
+                                workerType.remove("Others");
+                                workerType.add(otherType.text.trim());
+                              }
+
+                              String workerId = userController.myUser!.userId!;
+                              WorkerModal worker = WorkerModal(
+                                workerId: workerId,
+                                workerName: workerName.text.trim(),
+                                workerContat: workerContact.text.trim(),
+                                address: address.text.trim(),
+                                otherSkills: otherSkills.text.trim(),
+                                selectedGender: selectedGender,
+                                stateValue: stateValue ?? '',
+                                distValue: distValue ?? '',
+                                workType: workerType,
+                                workerImage: uploadedImageUrl,
+                                position: _location.data,
+                                lastUpdated: Timestamp.now(),
+                              );
+
+                              if (isEditing) {
+                                await workerMethod.updateWorker(worker, workerId);
+                              } else {
+                                await workerMethod.createWorker(worker, workerId);
+                                await sharedPreferencesMethods.clearUserData();
+                                await sharedPreferencesMethods.saveUserTypeAndUid("Workers", workerId);
+                              }
+
+                              controller.stopLoading();
+                              if(isEditing == false)await controller.getAllUsers();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(isEditing ? 'Worker updated successfully' : 'Worker added successfully'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+
+                              imagePickerController.imagePath.value = '';
+                              isEditing== true ? context.go(RoutsName.typeDashboard) : Navigator.pop(context);
+                            } catch (e) {
+                              controller.stopLoading();
+                              Get.snackbar(
+                                "Error",
+                                "Something went wrong while saving worker",
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                              );
+                            }
+                          }
+                        },
+                      );
                     }),
                     SizedBox(height: 10),
                     Row(

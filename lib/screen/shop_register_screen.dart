@@ -33,12 +33,15 @@ class ShopRegisterScreen extends StatefulWidget {
 }
 
 class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
-
   final userController = Get.find<GetUserController>();
-  final SharePreferencesMethods sharedPreferencesMethods = SharePreferencesMethods();
+  final Controller controller = Get.find<Controller>();
+
+  bool isEditing = false;
+
+  final SharePreferencesMethods sharedPreferencesMethods =
+      SharePreferencesMethods();
 
   final ShopMethods shopMethods = ShopMethods();
-  final Controller controller = Get.put(Controller());
   final imagePickerController = Get.put(ImagePickerController());
   final StorageServices storageServices = StorageServices();
   final TextEditingController shopName = TextEditingController();
@@ -58,7 +61,7 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
   List<String> shopTypes = [];
   Set<String> selectedCategories = {};
   Map<String, Set<String>> selectedSubcategories = {};
-  List<String> days=[];
+  List<String> days = [];
 
   late GeoFirePoint _location;
 
@@ -76,7 +79,9 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
 
     // Create GeoFirePoint
     GeoFirePoint myLocation = GeoFlutterFire().point(
-        latitude: latitude, longitude: longitude);
+      latitude: latitude,
+      longitude: longitude,
+    );
     _location = myLocation;
   }
 
@@ -85,6 +90,30 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
     // TODO: implement initState
     super.initState();
     getLocation();
+    if (userController.shopModal.value != null) {
+      setState(() {
+        isEditing = true;
+      });
+      shopImage = userController.shopModal.value!.shopImage;
+      // imagePickerController.imagePath.value =
+      //     userController.shopModal.value!.shopImage!;
+      shopName.text = userController.shopModal.value!.shopName!;
+      propritorName.text = userController.shopModal.value!.proprietorName!;
+      contactNo.text = userController.shopModal.value!.contactNo!;
+      shopTypes = userController.shopModal.value!.shopType!;
+      selectedCategories = userController.shopModal.value!.shopCategorySet!;
+      selectedSubcategories =
+          userController.shopModal.value!.shopSubcategoryMap!;
+      shopAddress.text = userController.shopModal.value!.shopAddress!;
+      stateValue = userController.shopModal.value!.stateValue!;
+      distValue = userController.shopModal.value!.distValue!;
+      openingTime.text = userController.shopModal.value!.openingTime!;
+      closingTime.text = userController.shopModal.value!.closingTime!;
+      aboutBusiness.text = userController.shopModal.value!.aboutBusiness!;
+      website.text = userController.shopModal.value!.website!;
+      days = userController.shopModal.value!.days!;
+      shopItem.text = userController.shopModal.value!.shopItem!;
+    }
   }
 
   @override
@@ -102,32 +131,29 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    final selectedChips = selectedSubcategories.entries
-        .expand((entry) => entry.value.map(
-          (subcat) => Chip(
-        label: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.check, color: Colors.black, size: 16),
-            SizedBox(width: 4),
-            Text(
-              subcat,
-              style: TextStyle(color: Colors.black),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: Colors.black26),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      ),
-    ))
-        .toList();
-
-
+    final selectedChips =
+        selectedSubcategories.entries
+            .expand(
+              (entry) => entry.value.map(
+                (subcat) => Chip(
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check, color: Colors.black, size: 16),
+                      SizedBox(width: 4),
+                      Text(subcat, style: TextStyle(color: Colors.black)),
+                    ],
+                  ),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.black26),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ),
+              ),
+            )
+            .toList();
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -154,20 +180,32 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
 
                   children: [
-                    const SizedBox(height: 10,),
+                    const SizedBox(height: 10),
                     GestureDetector(
-                        onTap: () {
-                          imagePickerController.getImage();
-                        },
-                        child:
-                        Obx(() {
-                          return imagePickerController.imagePath.value
-                              .isNotEmpty
-                              ? Image.file(
-                            File(imagePickerController.imagePath.value),
-                            height: 100, width: 100, fit: BoxFit.cover,
-                          )
-                              : CustomImageContainer(
+                      onTap: () {
+                        imagePickerController.getImage();
+                      },
+                      child: Obx(() {
+                        final pickedImage =
+                            imagePickerController.imagePath.value;
+
+                        if (pickedImage.isNotEmpty) {
+                          return Image.file(
+                            File(pickedImage),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          );
+                        } else if (shopImage!.isNotEmpty) {
+                          return Image(
+                            image: NetworkImage(shopImage!),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          // Show placeholder container
+                          return CustomImageContainer(
                             overlay: Container(
                               alignment: Alignment.bottomCenter,
                               padding: EdgeInsets.all(8),
@@ -183,21 +221,28 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                               ),
                             ),
                           );
-                        })
+                        }
+                      }),
                     ),
                     SizedBox(height: 20),
                     CustomTextField(
-                        controller: shopName, label: 'Business & Shop Name',color: Colors.black,),
+                      controller: shopName,
+                      label: 'Business & Shop Name',
+                      color: Colors.black,
+                    ),
                     SizedBox(height: 10),
                     CustomTextField(
-                        controller: propritorName, label: 'Proprietor Name',color: Colors.black),
+                      controller: propritorName,
+                      label: 'Proprietor Name',
+                      color: Colors.black,
+                    ),
                     SizedBox(height: 10),
 
                     CustomTextField(
                       controller: contactNo,
                       label: 'Contact No',
-                      inputType: TextInputType.number
-                        ,color: Colors.black
+                      inputType: TextInputType.number,
+                      color: Colors.black,
                     ),
 
                     SizedBox(height: 10),
@@ -210,22 +255,34 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                       child: Theme(
                         data: Theme.of(context).copyWith(
                           canvasColor: Colors.white,
-                          iconTheme: IconThemeData(color: Colors.black), // 👈 Changes the dropdown arrow color
+                          iconTheme: IconThemeData(
+                            color: Colors.black,
+                          ), // 👈 Changes the dropdown arrow color
                         ),
                         child: MultiSelectDialogField(
-                          items: Provider().business_type
-                              .map((e) => MultiSelectItem<String>(e, e))
-                              .toList(),
+                          items:
+                              Provider().business_type
+                                  .map((e) => MultiSelectItem<String>(e, e))
+                                  .toList(),
                           title: Text("Business Types"),
-                          buttonText: Text("Select Business Types",style: TextStyle(color: Colors.black),),
+                          buttonText: Text(
+                            "Select Business Types",
+                            style: TextStyle(color: Colors.black),
+                          ),
                           searchable: true,
                           backgroundColor: Colors.white,
-                          searchIcon: Icon(Icons.arrow_downward_sharp,color: Colors.black,),
+                          searchIcon: Icon(
+                            Icons.arrow_downward_sharp,
+                            color: Colors.black,
+                          ),
                           unselectedColor: Colors.black,
                           chipDisplay: MultiSelectChipDisplay(
                             chipColor: Colors.white,
-                            textStyle: TextStyle(color: Colors.black),),
-                          selectedItemsTextStyle: TextStyle(color: Colors.black),
+                            textStyle: TextStyle(color: Colors.black),
+                          ),
+                          selectedItemsTextStyle: TextStyle(
+                            color: Colors.black,
+                          ),
                           initialValue: shopTypes,
                           onConfirm: (values) {
                             setState(() {
@@ -235,40 +292,48 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10,),
+                    const SizedBox(height: 10),
 
                     GestureDetector(
                       onTap: _openCategoryDialog,
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 16),
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
-                            Expanded(child: Text("Select Business Categories",style: TextStyle(
-                              color: Colors.black87,
-                            ),)),
-                            Icon(Icons.arrow_drop_down,color: Colors.black,),
+                            Expanded(
+                              child: Text(
+                                "Select Business Categories",
+                                style: TextStyle(color: Colors.black87),
+                              ),
+                            ),
+                            Icon(Icons.arrow_drop_down, color: Colors.black),
                           ],
                         ),
                       ),
                     ),
                     SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: selectedChips,
-                    ),
+                    Wrap(spacing: 8, runSpacing: 8, children: selectedChips),
                     SizedBox(height: 10),
                     CustomTextField(
-                        controller: shopItem, label: 'Add all your Product',color: Colors.black),
+                      controller: shopItem,
+                      label: 'Add all your Product',
+                      color: Colors.black,
+                    ),
 
-                    const SizedBox(height: 10,),
+                    const SizedBox(height: 10),
 
-                    CustomTextField(controller: shopAddress, label: 'Address',color: Colors.black),
+                    CustomTextField(
+                      controller: shopAddress,
+                      label: 'Address',
+                      color: Colors.black,
+                    ),
 
                     const SizedBox(height: 10),
 
@@ -289,9 +354,9 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                       hint: " - - Select District - -",
                       value: distValue,
                       items:
-                      stateValue != null
-                          ? stateDistrictMap[stateValue]!.toList()
-                          : [],
+                          stateValue != null
+                              ? stateDistrictMap[stateValue]!.toList()
+                              : [],
 
                       onChanged: (dist) {
                         distValue = dist;
@@ -307,22 +372,34 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                       child: Theme(
                         data: Theme.of(context).copyWith(
                           canvasColor: Colors.white,
-                          iconTheme: IconThemeData(color: Colors.black), // 👈 Changes the dropdown arrow color
+                          iconTheme: IconThemeData(
+                            color: Colors.black,
+                          ), // 👈 Changes the dropdown arrow color
                         ),
                         child: MultiSelectDialogField(
-                          items: Provider().days
-                              .map((e) => MultiSelectItem<String>(e, e))
-                              .toList(),
+                          items:
+                              Provider().days
+                                  .map((e) => MultiSelectItem<String>(e, e))
+                                  .toList(),
                           title: Text("Days"),
-                          buttonText: Text("Select days",style: TextStyle(color: Colors.black),),
+                          buttonText: Text(
+                            "Select days",
+                            style: TextStyle(color: Colors.black),
+                          ),
                           searchable: true,
                           backgroundColor: Colors.white,
-                          searchIcon: Icon(Icons.arrow_downward_sharp,color: Colors.black,),
+                          searchIcon: Icon(
+                            Icons.arrow_downward_sharp,
+                            color: Colors.black,
+                          ),
                           unselectedColor: Colors.black,
                           chipDisplay: MultiSelectChipDisplay(
                             chipColor: Colors.white,
-                            textStyle: TextStyle(color: Colors.black),),
-                          selectedItemsTextStyle: TextStyle(color: Colors.black),
+                            textStyle: TextStyle(color: Colors.black),
+                          ),
+                          selectedItemsTextStyle: TextStyle(
+                            color: Colors.black,
+                          ),
                           initialValue: days,
                           onConfirm: (values) {
                             setState(() {
@@ -332,95 +409,209 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    SizedBox(height: 10),
 
-                    CustomTextField(controller: openingTime,color: Colors.black,label: 'Opening Time',),
+                    CustomTextField(
+                      controller: openingTime,
+                      color: Colors.black,
+                      label: 'Opening Time',
+                    ),
                     SizedBox(height: 10),
-                    CustomTextField(controller: closingTime,color: Colors.black,label: 'Closing Time',),
+                    CustomTextField(
+                      controller: closingTime,
+                      color: Colors.black,
+                      label: 'Closing Time',
+                    ),
                     SizedBox(height: 10),
-                    CustomTextField(controller: aboutBusiness,color: Colors.black,label: 'About Business',),
+                    CustomTextField(
+                      controller: aboutBusiness,
+                      color: Colors.black,
+                      label: 'About Business',
+                    ),
                     SizedBox(height: 10),
-                    CustomTextField(controller: website,color: Colors.black,label: 'Website',),
-                    SizedBox(height: 10,),
+                    CustomTextField(
+                      controller: website,
+                      color: Colors.black,
+                      label: 'Website',
+                    ),
+                    SizedBox(height: 10),
 
                     Obx(() {
                       return controller.isLoading.value
                           ? const CircularProgressIndicator(color: Colors.black)
+                          // : CustomButton(
+                          //   backgroundColor: customTextColor,
+                          //   label:isEditing == false ? "Register" : "Update profile",
+                          //   onPressed: () async {
+                          //     if (_formKey.currentState!.validate() &&
+                          //         imagePickerController
+                          //             .imagePath
+                          //             .value
+                          //             .isNotEmpty) {
+                          //       controller.startLoading();
+                          //       File file = File(
+                          //         imagePickerController.imagePath.value,
+                          //       );
+                          //       String url = await storageServices.uploadImage(
+                          //         file,
+                          //       );
+                          //
+                          //       String randomId =
+                          //           userController.myUser!.userId!;
+                          //
+                          //       ShopModal shopModel = ShopModal(
+                          //         shopId: randomId,
+                          //         shopImage: url,
+                          //         shopName: shopName.text.toString(),
+                          //         proprietorName: propritorName.text.toString(),
+                          //         contactNo: contactNo.text.toString(),
+                          //         shopType: shopTypes,
+                          //         shopCategorySet: selectedCategories,
+                          //         shopSubcategoryMap: selectedSubcategories,
+                          //         shopAddress: shopAddress.text.toString(),
+                          //         stateValue: stateValue.toString(),
+                          //         distValue: distValue.toString(),
+                          //         openingTime: openingTime.text.toString(),
+                          //         closingTime: closingTime.text.toString(),
+                          //         aboutBusiness: aboutBusiness.text.toString(),
+                          //         website: website.text.toString(),
+                          //         days: days,
+                          //         shopItem: shopItem.text.toString(),
+                          //         position: _location.data,
+                          //         lastUpdated: Timestamp.now(),
+                          //       );
+                          //
+                          //       if (randomId.isNotEmpty) {
+                          //         await shopMethods.insertShop(
+                          //           shopModel,
+                          //           randomId,
+                          //         );
+                          //       }
+                          //       await sharedPreferencesMethods.clearUserData();
+                          //       await sharedPreferencesMethods
+                          //           .saveUserTypeAndUid("Shops", randomId);
+                          //       imagePickerController.imagePath.value = '';
+                          //
+                          //       Navigator.pop(context);
+                          //       controller.stopLoading();
+                          //       await controller.getAllUsers();
+                          //
+                          //       ScaffoldMessenger.of(context).showSnackBar(
+                          //         SnackBar(
+                          //           content: Text('Shop added successfully'),
+                          //           backgroundColor: Colors.green,
+                          //         ),
+                          //       );
+                          //     }
+                          //   },
+                          // );
                           : CustomButton(
-                        backgroundColor: customTextColor,
-                        label: "Register",
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate() &&
-                              imagePickerController.imagePath.value
-                                  .isNotEmpty) {
-                            controller.startLoading();
-                            File file = File(
-                                imagePickerController.imagePath.value);
-                            String url = await storageServices.uploadImage(
-                                file);
+                            backgroundColor: customTextColor,
+                            label:
+                                isEditing == false
+                                    ? "Register"
+                                    : "Update Profile",
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate() &&
+                                  (imagePickerController
+                                          .imagePath
+                                          .value
+                                          .isNotEmpty ||
+                                      shopImage != null)) {
+                                controller.startLoading();
 
-                            String randomId = userController.myUser!.userId!;
+                                String url = shopImage ?? '';
+                                // If user picked a new image, upload it
+                                if (imagePickerController
+                                    .imagePath
+                                    .value
+                                    .isNotEmpty) {
+                                  File file = File(
+                                    imagePickerController.imagePath.value,
+                                  );
+                                  url = await storageServices.uploadImage(file);
+                                }
 
-                            ShopModal shopModel = ShopModal(
-                              shopId: randomId,
-                              shopImage: url,
-                              shopName: shopName.text.toString(),
-                              proprietorName: propritorName.text.toString(),
-                              contactNo: contactNo.text.toString(),
-                              shopType: shopTypes,
-                              shopCategorySet: selectedCategories,
-                              shopSubcategoryMap: selectedSubcategories,
-                              shopAddress: shopAddress.text.toString(),
-                              stateValue: stateValue.toString(),
-                              distValue: distValue.toString(),
-                              openingTime: openingTime.text.toString(),
-                              closingTime: closingTime.text.toString(),
-                              aboutBusiness: aboutBusiness.text.toString(),
-                              website: website.text.toString(),
-                              days: days,
-                              shopItem: shopItem.text.toString(),
-                              position: _location.data,
-                              lastUpdated: Timestamp.now(),
-                            );
+                                // Get shop ID — same for both add/edit
+                                String shopId = userController.myUser!.userId!;
 
-                            if (randomId.isNotEmpty) {
-                              await shopMethods.insertShop(shopModel, randomId);
-                            }
-                            await sharedPreferencesMethods.clearUserData();
-                            await sharedPreferencesMethods.saveUserTypeAndUid("Shops", randomId);
-                            imagePickerController.imagePath.value = '';
+                                // Construct the ShopModal
+                                ShopModal shopModel = ShopModal(
+                                  shopId: shopId,
+                                  shopImage: url,
+                                  shopName: shopName.text.toString(),
+                                  proprietorName: propritorName.text.toString(),
+                                  contactNo: contactNo.text.toString(),
+                                  shopType: shopTypes,
+                                  shopCategorySet: selectedCategories,
+                                  shopSubcategoryMap: selectedSubcategories,
+                                  shopAddress: shopAddress.text.toString(),
+                                  stateValue: stateValue.toString(),
+                                  distValue: distValue.toString(),
+                                  openingTime: openingTime.text.toString(),
+                                  closingTime: closingTime.text.toString(),
+                                  aboutBusiness: aboutBusiness.text.toString(),
+                                  website: website.text.toString(),
+                                  days: days,
+                                  shopItem: shopItem.text.toString(),
+                                  position: _location.data,
+                                  lastUpdated: Timestamp.now(),
+                                );
 
-                            Navigator.pop(context);
-                            controller.stopLoading();
-                            await controller.getAllUsers();
+                                if (isEditing) {
+                                  // Update shop
+                                  await shopMethods.updateShop(
+                                    shopModel,
+                                    shopId,
+                                  );
+                                } else {
+                                  // Insert new shop
+                                  await shopMethods.insertShop(
+                                    shopModel,
+                                    shopId,
+                                  );
+                                  await sharedPreferencesMethods
+                                      .clearUserData();
+                                  await sharedPreferencesMethods
+                                      .saveUserTypeAndUid("Shops", shopId);
+                                }
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Shop added successfully'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          }
-                        },
-                      );
+                                imagePickerController.imagePath.value = '';
+                                controller.stopLoading();
+                                if (isEditing == false)
+                                  await controller.getAllUsers();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isEditing
+                                        ? 'Shop profile updated successfully'
+                                        : 'Shop registered successfully'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                isEditing == true
+                                    ? context.go(RoutsName.typeDashboard)
+                                    : Navigator.pop(context);
+                              }
+                            },
+                          );
                     }),
                     SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        InkWell(
-                          onTap:
-                              () =>
-                              context.go(
-                                "${RoutsName.loginScreen}/$shopLogin",
-                              ),
-                          child: Text(
-                            "Already have Account? Login",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.end,
+                    //   children: [
+                    //     InkWell(
+                    //       onTap:
+                    //           () => context.go(
+                    //             "${RoutsName.loginScreen}/$shopLogin",
+                    //           ),
+                    //       child: Text(
+                    //         "Already have Account? Login",
+                    //         style: TextStyle(color: Colors.black),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),
@@ -444,59 +635,65 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                 height: 400,
                 child: Scrollbar(
                   child: ListView(
-                    children: Provider().business_category.entries.map((entry) {
-                      final category = entry.key;
-                      final subcats = entry.value;
+                    children:
+                        Provider().business_category.entries.map((entry) {
+                          final category = entry.key;
+                          final subcats = entry.value;
 
-                      return ExpansionTile(
-                        title: Row(
-                          children: [
-                            Checkbox(
-                              value: selectedCategories.contains(category),
-                              onChanged: (bool? checked) {
-                                setState(() {
-                                  setStateDialog(() {
-                                    if (checked == true) {
-                                      selectedCategories.add(category);
-                                      selectedSubcategories[category] =
-                                          selectedSubcategories[category] ?? {};
-                                    } else {
-                                      selectedCategories.remove(category);
-                                      selectedSubcategories.remove(category);
-                                    }
-                                  });
-                                });
-                              },
+                          return ExpansionTile(
+                            title: Row(
+                              children: [
+                                Checkbox(
+                                  value: selectedCategories.contains(category),
+                                  onChanged: (bool? checked) {
+                                    setState(() {
+                                      setStateDialog(() {
+                                        if (checked == true) {
+                                          selectedCategories.add(category);
+                                          selectedSubcategories[category] =
+                                              selectedSubcategories[category] ??
+                                              {};
+                                        } else {
+                                          selectedCategories.remove(category);
+                                          selectedSubcategories.remove(
+                                            category,
+                                          );
+                                        }
+                                      });
+                                    });
+                                  },
+                                ),
+                                Expanded(child: Text(category)),
+                              ],
                             ),
-                            Expanded(child: Text(category)),
-                          ],
-                        ),
-                        children: subcats.map((subcat) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: CheckboxListTile(
-                              title: Text(subcat),
-                              value: selectedSubcategories[category]
-                                  ?.contains(subcat) ??
-                                  false,
-                              onChanged: (bool? checked) {
-                                setState(() {
-                                  setStateDialog(() {
-                                    if (checked == true) {
-                                      selectedSubcategories[category]
-                                          ?.add(subcat);
-                                    } else {
-                                      selectedSubcategories[category]
-                                          ?.remove(subcat);
-                                    }
-                                  });
-                                });
-                              },
-                            ),
+                            children:
+                                subcats.map((subcat) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child: CheckboxListTile(
+                                      title: Text(subcat),
+                                      value:
+                                          selectedSubcategories[category]
+                                              ?.contains(subcat) ??
+                                          false,
+                                      onChanged: (bool? checked) {
+                                        setState(() {
+                                          setStateDialog(() {
+                                            if (checked == true) {
+                                              selectedSubcategories[category]
+                                                  ?.add(subcat);
+                                            } else {
+                                              selectedSubcategories[category]
+                                                  ?.remove(subcat);
+                                            }
+                                          });
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
                           );
                         }).toList(),
-                      );
-                    }).toList(),
                   ),
                 ),
               );
@@ -512,7 +709,7 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                 Navigator.pop(context); // Save and close
                 setState(() {});
                 print(selectedCategories);
-                print(selectedSubcategories);// Update chips UI
+                print(selectedSubcategories); // Update chips UI
               },
               child: Text("Done"),
             ),
