@@ -193,7 +193,7 @@ class _SearchScreenState extends State<SearchScreen> {
           // ),
           Expanded(
             child: Obx(() => GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
+              // physics: const NeverScrollableScrollPhysics(),
               itemCount: searchController.allResults.isNotEmpty
                   ? searchController.allResults.length
                   : controller.allUsers.length,

@@ -23,7 +23,6 @@ class AdServices{
     List<AddModal> relevantAds = [];
 
     try {
-      // Step 1: Get user's current location and convert to district
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );

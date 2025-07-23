@@ -28,9 +28,9 @@ class _JobListCardState extends State<JobListCard> {
 
   Widget build(BuildContext context) {
 
-    final Timestamp timestamp = widget.item.createdAt!;
-    final DateTime dateTime = timestamp.toDate();
-    final String formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+    // final Timestamp timestamp = widget.item.createdAt!;
+    // final DateTime dateTime = timestamp.toDate();
+    // final String formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
 
     double screenWidth = MediaQuery.of(context).size.width;
     double imageHeight;
@@ -113,7 +113,7 @@ class _JobListCardState extends State<JobListCard> {
                 ),
               ),
             const SizedBox(height: 10,),
-            Text(formattedDate,style: TextStyle(color: Colors.white),)
+            Text(widget.item.createdAt!,style: TextStyle(color: Colors.white38),)
           ],
         ),
       ),

@@ -139,7 +139,7 @@ final GoRouter router = GoRouter(
     GoRoute(
         path: RoutsName.cardDetailScreen,
         builder: (context, state) {
-          final user = state.extra as AllUserModal?;
+          final user = state.extra as AllUserModal;
           return CardDetailsScreen(users: user);
         }
     ),

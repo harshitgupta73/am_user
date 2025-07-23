@@ -74,13 +74,13 @@ class _TypeDashboardScreenState extends State<TypeDashboardScreen> {
           actions: [
             IconButton(
               onPressed: () async {
-                context.go(RoutsName.addPostScreen);
+                context.push(RoutsName.addPostScreen);
               },
               icon: Icon(Icons.add, color: Colors.white),
             ),
             IconButton(
               onPressed: () async {
-                type == "Shop" ? context.go(RoutsName.shopRegisterScreen) : type == "Driver" ? context.go(RoutsName.driverRegisterScreen) : context.go(RoutsName.workRegisterScreen);
+                type == "Shop" ? context.push(RoutsName.shopRegisterScreen) : type == "Driver" ? context.go(RoutsName.driverRegisterScreen) : context.go(RoutsName.workRegisterScreen);
               },
               icon: Icon(Icons.edit, color: Colors.white),
             ),
@@ -125,7 +125,13 @@ class _TypeDashboardScreenState extends State<TypeDashboardScreen> {
                             ),
                           ),
                           Text(
-                            "Contact: ${userController.shopModal.value!.contactNo}",
+                            type == 'Shop'
+                                ? userController.shopModal.value!.contactNo ?? ''
+                                : type == 'Driver'
+                                ? userController.driverModal.value!.driverContact ??
+                                ''
+                                : userController.workerModal.value!.workerContat ??
+                                '',
                             style: const TextStyle(color: Colors.black),
                           ),
                           Text(

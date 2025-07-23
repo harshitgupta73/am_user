@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class JobModel {
-  final String jobId;
-  final String? images;
-  final String? video;
-  final String? name;
-  final Timestamp? createdAt;
+  String jobId;
+  String? images;
+  String? video;
+  String? name;
+  String? createdAt;
 
   JobModel({
     required this.jobId,
@@ -21,7 +21,7 @@ class JobModel {
       name: map['name'] ?? '',
       images: map['images'] ?? '',
       video: map['video'] ?? '',
-      createdAt: Timestamp.now(),
+      createdAt: map['createdAt'] ?? '',
     );
   }
 

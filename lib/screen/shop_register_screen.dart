@@ -196,7 +196,7 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                             width: 100,
                             fit: BoxFit.cover,
                           );
-                        } else if (shopImage!.isNotEmpty) {
+                        } else if (shopImage != null) {
                           return Image(
                             image: NetworkImage(shopImage!),
                             height: 100,

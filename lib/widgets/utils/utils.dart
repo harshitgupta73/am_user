@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class Utils{
@@ -19,6 +20,21 @@ class Utils{
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
  }
 
-
-
+ Future<void> dialNumber(String phoneNumber, BuildContext context) async {
+   final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+   try {
+     if (await canLaunchUrl(uri)) {
+       await launchUrl(uri);
+     } else {
+       ScaffoldMessenger.of(context).showSnackBar(
+         const SnackBar(content: Text("Cannot open dialer")),
+       );
+     }
+   } catch (e) {
+     ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(content: Text("Error: $e")),
+     );
+     print("Error: $e");
+   }
+ }
 }

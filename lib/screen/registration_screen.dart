@@ -45,7 +45,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         backgroundColor: backgroundColor,
         iconTheme: IconThemeData(color: Colors.black),
       ),
-      body: type == "User" ? Padding(
+      body: type == "user" ? Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 8),
         child: Column(
           children: [

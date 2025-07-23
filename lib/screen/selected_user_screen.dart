@@ -53,7 +53,7 @@ class _SelectedUserScreenState extends State<SelectedUserScreen> {
         final driver = controller.drivers[index];
         return GestureDetector(
           onTap: (){
-            context.go(
+            context.push(
               '${RoutsName.cardDetailScreen}',
               extra: AllUserModal(name: driver.driverName!, contact: driver.driverContact!, image: driver.driverImage!, type: 'Driver', id: driver.driverId!)
             );
@@ -81,7 +81,7 @@ class _SelectedUserScreenState extends State<SelectedUserScreen> {
         final worker = filtered[index];
         return GestureDetector(
           onTap: () {
-            context.go(
+            context.push(
               '${RoutsName.cardDetailScreen}',
               extra: AllUserModal(name: worker.workerName!, contact: worker.workerContat!, image: worker.workerImage!, type: "Worker", id: worker.workerId!)
             );
@@ -130,7 +130,7 @@ class _SelectedUserScreenState extends State<SelectedUserScreen> {
           children: [
             GestureDetector(
               onTap: (){
-                context.go(
+                context.push(
                   '${RoutsName.cardDetailScreen}',
                   extra: AllUserModal(name: shop.shopName!, contact: shop.contactNo!, image: shop.shopImage!, type: "Shop", id: shop.shopId!)
                 );

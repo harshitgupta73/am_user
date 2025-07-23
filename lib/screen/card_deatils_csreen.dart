@@ -7,11 +7,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 import '../controller/user_provider/get_user_provider.dart';
 import '../modals/driver_modal.dart';
 import '../responsive/reponsive_layout.dart';
+import '../widgets/utils/utils.dart';
 
 class CardDetailsScreen extends StatefulWidget {
   final AllUserModal? users;
@@ -141,7 +143,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final d = widget.users;
-    final size  = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(title: Text('${d!.type} Details')),
@@ -205,14 +207,18 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                             : "City: ${worker?.distValue ?? '-'}",
                         style: const TextStyle(color: Colors.white),
                       ),
-                      d.type == "Shop" ? Text("Working hour : ${shop!.openingTime}-${shop!.closingTime}"): Container(height: 0,),
-                      d.type == "Shop" &&
-                          userController.shopModal.value?.days != null &&
-                          userController.shopModal.value!.days!.isNotEmpty
+                      d.type == "Shop"
                           ? Text(
-                        "Opening days: ${userController.shopModal.value!.days!.join(', ')}",
-                        style: const TextStyle(color: Colors.white),
-                      )
+                            "Working hour : ${shop!.openingTime}-${shop!.closingTime}",
+                          )
+                          : Container(height: 0),
+                      d.type == "Shop" &&
+                              userController.shopModal.value?.days != null &&
+                              userController.shopModal.value!.days!.isNotEmpty
+                          ? Text(
+                            "Opening days: ${userController.shopModal.value!.days!.join(', ')}",
+                            style: const TextStyle(color: Colors.white),
+                          )
                           : const SizedBox.shrink(),
                     ],
                   ),
@@ -234,9 +240,10 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
             //
             // const Divider(height: 30, color: Colors.white54),
 
-
             // // Document Images - Driving Licence
-            d.type == "Driver" ?_buildImage(driver!.drivingLicence, "Driving Licence") : SizedBox(height: 0,),
+            d.type == "Driver"
+                ? _buildImage(driver!.drivingLicence, "Driving Licence")
+                : SizedBox(height: 0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -244,29 +251,25 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      // final phoneNumber = widget.users.contact;
-                      // if (phoneNumber != null && phoneNumber.isNotEmpty) {
-                      //   final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
-                      //   if (await canLaunchUrl(launchUri)) {
-                      //     await launchUrl(launchUri);
-                      //   } else {
-                      //     ScaffoldMessenger.of(context).showSnackBar(
-                      //       const SnackBar(content: Text("Cannot launch dialer")),
-                      //     );
-                      //   }
-                      // }
+                      final phoneNumber = d.contact;
+                      await Utils().dialNumber(phoneNumber, context);
                     },
                     icon: const Icon(Icons.phone),
                     label: const Text("Call"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(width: 10,),
+                SizedBox(width: 10),
                 // 💬 Message Button
                 Expanded(
                   child: ElevatedButton.icon(
@@ -289,8 +292,13 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),
@@ -355,36 +363,102 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
             ),
 
             const SizedBox(height: 20),
-
             // Show Posts or Videos
-            isVideo
-                ? Column(
-                  children: List.generate(userController.otherUser.value!.videos!.length, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: _buildVideoCard(index),
-                    );
-                  }),
-                )
-                : GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: userController.otherUser.value!.images!.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
+            // isVideo
+            //     ? userController.otherUser.value!.videos != null
+            //         ? Column(
+            //           children: List.generate(
+            //             userController.otherUser.value!.videos!.length,
+            //             (index) {
+            //               return Padding(
+            //                 padding: const EdgeInsets.only(bottom: 20),
+            //                 child: _buildVideoCard(index),
+            //               );
+            //             },
+            //           ),
+            //         )
+            //         : const Center(
+            //           child: Text(
+            //             "No videos available",
+            //             style: TextStyle(color: Colors.white),
+            //           ),
+            //         )
+            //     : userController.otherUser.value!.images != null
+            //     ? GridView.builder(
+            //       shrinkWrap: true,
+            //       physics: const NeverScrollableScrollPhysics(),
+            //       itemCount: userController.otherUser.value!.images!.length,
+            //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //         crossAxisCount: 3,
+            //         crossAxisSpacing: 8,
+            //         mainAxisSpacing: 8,
+            //       ),
+            //       itemBuilder: (context, index) {
+            //         return ClipRRect(
+            //           borderRadius: BorderRadius.circular(8),
+            //           child: Image.network(
+            //             userController.otherUser.value!.images![index],
+            //             fit: BoxFit.cover,
+            //           ),
+            //         );
+            //       },
+            //     )
+            //     : const Center(
+            //       child: Text(
+            //         "No images available",
+            //         style: TextStyle(color: Colors.white),
+            //       ),
+            //
+            //     ),
+            Obx(()
+              => isVideo
+                  ? (userController.otherUser.value!.videos != null &&
+                          userController.otherUser.value!.videos!.isNotEmpty)
+                      ? Column(
+                        children: List.generate(
+                          userController.otherUser.value!.videos!.length,
+                          (index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: _buildVideoCard(index),
+                            );
+                          },
+                        ),
+                      )
+                      : const Center(
+                        child: Text(
+                          "No videos available",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                  : (userController.otherUser.value!.images != null &&
+                      userController.otherUser.value!.images!.isNotEmpty)
+                  ? GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: userController.otherUser.value!.images!.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemBuilder: (context, index) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          userController.otherUser.value!.images![index],
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  )
+                  : const Center(
+                    child: Text(
+                      "No images available",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        userController.otherUser.value!.images![index],
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  },
-                ),
+            ),
           ],
         ),
       ),

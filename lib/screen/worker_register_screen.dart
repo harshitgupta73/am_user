@@ -160,7 +160,7 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                             width: 100,
                             fit: BoxFit.cover,
                           );
-                        }else if(workerImage!.isNotEmpty){
+                        }else if(workerImage != null){
                           return Image(
                             image: NetworkImage(workerImage!),
                             height: 100,

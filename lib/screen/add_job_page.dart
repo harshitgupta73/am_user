@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../controller/image_picker_controller.dart';
 import '../controller/job_controller/job_controller.dart';
@@ -40,6 +42,8 @@ class _AddJobPageState extends State<AddJobPage> {
     _focusNode.dispose();
     super.dispose();
   }
+
+  final formattedTime = DateFormat('kk:mm dd/MM/yyyy').format(DateTime.now());
 
   TextEditingController name = TextEditingController();
   final imagePickerController = Get.find<ImagePickerController>();
@@ -216,7 +220,7 @@ class _AddJobPageState extends State<AddJobPage> {
           if (selectedType == "text" && name.text.isNotEmpty) {
             String jobId =
                 FirebaseFirestore.instance.collection("Jobs").doc().id;
-            JobModel job = JobModel(jobId: jobId, name: name.text,createdAt: Timestamp.now());
+            JobModel job = JobModel(jobId: jobId, name: name.text,createdAt: formattedTime);
             if (jobId.isNotEmpty) {
               await jobController.addJob(job);
             }
@@ -226,7 +230,7 @@ class _AddJobPageState extends State<AddJobPage> {
 
             String jobId =
                 FirebaseFirestore.instance.collection("Jobs").doc().id;
-            JobModel job = JobModel(jobId: jobId, images: url,createdAt: Timestamp.now());
+            JobModel job = JobModel(jobId: jobId, images: url,createdAt: formattedTime);
             if (jobId.isNotEmpty) {
               await jobController.addJob(job);
             }
@@ -235,9 +239,12 @@ class _AddJobPageState extends State<AddJobPage> {
             String url = await storageServices.uploadVideo(file);
             String jobId =
                 FirebaseFirestore.instance.collection("Jobs").doc().id;
-            JobModel job = JobModel(jobId: jobId, video: url,createdAt: Timestamp.now());
+            JobModel job = JobModel(jobId: jobId, video: url,createdAt: formattedTime);
             await jobController.addJob(job);
           }
+
+          await jobController.loadJobs();
+          context.pop();
           name.clear();
           pickedFile = null;
           pickedImage = null;
