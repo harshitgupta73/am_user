@@ -564,6 +564,7 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                                     shopModel,
                                     shopId,
                                   );
+                                  await userController.loadUserFromFirestore();
                                 } else {
                                   // Insert new shop
                                   await shopMethods.insertShop(

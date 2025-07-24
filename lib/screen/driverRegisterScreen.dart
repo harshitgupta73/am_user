@@ -14,6 +14,7 @@ import '../controller/image_picker_controller.dart';
 import '../controller/user_provider/get_user_provider.dart';
 import '../data/firebase/driver_methods/driver_insert_update.dart';
 import '../data/shareprefrance/shareprefrance.dart';
+import '../widgets/common_methods.dart';
 import '../widgets/component/custom_buttom.dart';
 import '../widgets/component/custom_dropdwon.dart';
 import '../widgets/component/custom_image_container.dart';
@@ -89,25 +90,24 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
     // TODO: implement initState
     super.initState();
     getLocation();
-    if(userController.driverModal.value != null){
-      setState(() {
+    final driver= userController.driverModal.value;
+    if(driver != null){
         isEditing= true;
-      });
-      driverImage = userController.driverModal.value!.driverImage;
-      driverName.text = userController.driverModal.value!.driverName!;
-      driverContact.text = userController.driverModal.value!.driverContact!;
-      driverLicenceNo.text = userController.driverModal.value!.driverLicenceNo!;
-      drivingLicence = userController.driverModal.value!.drivingLicence!;
+      driverImage = driver.driverImage;
+      driverName.text = driver.driverName!;
+      driverContact.text = driver.driverContact!;
+      driverLicenceNo.text = driver.driverLicenceNo!;
+      drivingLicence = driver.drivingLicence!;
 
-      vehicleNo.text = userController.driverModal.value!.vehicleNo!;
-      vehicleName.text = userController.driverModal.value!.vehicleName!;
-      vehicleOwnerName.text = userController.driverModal.value!.vehicleOwnerName!;
-      vehicleRcImage = userController.driverModal.value!.vehicleRcImage!;
+      vehicleNo.text = driver.vehicleNo!;
+      vehicleName.text = driver.vehicleName!;
+      vehicleOwnerName.text = driver.vehicleOwnerName!;
+      vehicleRcImage = driver.vehicleRcImage!;
 
-      driverAddress.text = userController.driverModal.value!.driverAddress!;
-      driverOtherSkill.text = userController.driverModal.value!.driverOtherSkill!;
-      stateValue = userController.driverModal.value!.stateValue!;
-      distValue = userController.driverModal.value!.distValue!;
+      driverAddress.text = driver.driverAddress!;
+      driverOtherSkill.text = driver.driverOtherSkill!;
+      stateValue = driver.stateValue!;
+      distValue = driver.distValue!;
     }
   }
 
@@ -128,7 +128,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
               alignment: Alignment.center,
               width: 500,
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: backgroundColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Form(
@@ -142,7 +142,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                         Text(
                           "Driver Register",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontWeight: FontWeight.w500,
                             fontSize: 21,
                           ),
@@ -199,6 +199,8 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                     CustomTextField(
                       controller: driverName,
                       label: 'Driver Name',
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
 
                     SizedBox(height: 10),
@@ -206,12 +208,16 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                       controller: driverContact,
                       label: 'Contact No',
                       inputType: TextInputType.number,
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
                     CustomTextField(
                       controller: driverLicenceNo,
                       label: 'Driving Licence',
                       inputType: TextInputType.number,
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
                     ImagePickerButton(
@@ -231,18 +237,24 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                       controller: vehicleNo,
                       label: 'Vehicle No',
                       inputType: TextInputType.text,
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
                     CustomTextField(
                       controller: vehicleName,
                       label: 'Vehicle Name',
                       inputType: TextInputType.text,
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
                     CustomTextField(
                       controller: vehicleOwnerName,
                       label: 'Vehicle owner Name',
                       inputType: TextInputType.text,
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
 
@@ -263,6 +275,8 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                     CustomTextField(
                       controller: driverAddress,
                       label: 'Address',
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
                     CustomDropdown(
@@ -296,13 +310,16 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
 
                     CustomTextField(
                       controller: driverOtherSkill,
-                      label: 'Other Skills (,)',
+                      label: 'Other Skills',
+                      cursorColor: Colors.black,
+                      color: customTextColor,
                     ),
                     SizedBox(height: 10),
                     Obx(() {
                       return controller.isLoading.value
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const CircularProgressIndicator(color: Colors.black)
                           : CustomButton(
+                            textColor: Colors.black,
                             backgroundColor: backgroundColor,
                             label:isEditing ? "Update" : "Register",
                             onPressed: () async {
@@ -365,14 +382,16 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                                   // print(randomId);
                                   if (isEditing) {
                                     await driverMethods.updateDriver(driver, randomId);
+                                    await userController.loadUserFromFirestore();
                                   } else {
                                     await driverMethods.insertDriver(driver, randomId);
                                     await sharedPreferencesMethods.clearUserData();
                                     await sharedPreferencesMethods.saveUserTypeAndUid("drivers", randomId);
                                   }
+
                                   controller.stopLoading();
 
-                                  if(!isEditing) await controller.getAllUsers();
+                                  await controller.getAllUsers();
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -382,8 +401,12 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                                       backgroundColor: Colors.green,
                                     ),
                                   );
-                                  imagePickerController.imagePath.value = "";
-                                  isEditing== true ? context.go(RoutsName.typeDashboard) : Navigator.pop(context);
+                                  if (!isEditing) {
+                                    imagePickerController.imagePath.value = '';
+                                    Navigator.pop(context);
+                                  } else {
+                                    customNavigate(context, RoutsName.typeDashboard, null);
+                                  }
                                 } catch (e) {
                                   Get.snackbar(
                                     "Error",

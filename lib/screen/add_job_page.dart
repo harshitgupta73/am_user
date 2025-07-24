@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:am_user/widgets/constants/const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:video_compress/video_compress.dart';
 
 import '../controller/image_picker_controller.dart';
 import '../controller/job_controller/job_controller.dart';
@@ -43,6 +45,17 @@ class _AddJobPageState extends State<AddJobPage> {
     super.dispose();
   }
 
+  File? videoThumbnail;
+
+  Future<File?> getVideoThumbnail(String videoPath) async {
+    final thumbnail = await VideoCompress.getFileThumbnail(
+      videoPath,
+      quality: 50, // 0 to 100
+      position: -1, // -1 = auto select, or provide seconds (e.g. 2)
+    );
+    return thumbnail;
+  }
+
   final formattedTime = DateFormat('kk:mm dd/MM/yyyy').format(DateTime.now());
 
   TextEditingController name = TextEditingController();
@@ -58,6 +71,7 @@ class _AddJobPageState extends State<AddJobPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(title: Text("Add Information"), centerTitle: true),
       body: DefaultTabController(
         length: 3,
@@ -67,11 +81,14 @@ class _AddJobPageState extends State<AddJobPage> {
             // Tab Bar
             TabBar(
               labelColor: Colors.blue,
+              unselectedLabelColor: Colors.black,
               indicatorColor: Colors.blue,
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.label,
+              dividerColor: Colors.black,
               tabs: [Tab(text: "Text"), Tab(text: "Image"), Tab(text: "Video")],
             ),
             SizedBox(height: 20),
-
             // Tab Views
             Container(
               height: 600,
@@ -79,19 +96,28 @@ class _AddJobPageState extends State<AddJobPage> {
               child: TabBarView(
                 children: [
                   // TEXT Tab
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      focusNode: _focusNode,
-                        controller: name,
-                        maxLines: null,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          labelText: "Enter work content",
-                          border: InputBorder.none,
-                        ),
-                      ),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                              focusNode: _focusNode,
+                              cursorColor: Colors.black,
+                              controller: name,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              style: TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                labelText: "Enter work content",
+                                border: InputBorder.none,
+                                labelStyle: TextStyle(color: Colors.black)
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
 
                   // IMAGE Tab
                   Column(
@@ -174,6 +200,7 @@ class _AddJobPageState extends State<AddJobPage> {
                                         pickedFile = file.path;
                                       });
                                     }
+                                    videoThumbnail = await getVideoThumbnail(file!.path);
                                   },
                                   child: Text("Open Camera"),
                                 ),
@@ -195,6 +222,7 @@ class _AddJobPageState extends State<AddJobPage> {
                                         pickedFile = file.path;
                                       });
                                     }
+                                    videoThumbnail = await getVideoThumbnail(file!.path);
                                   },
                                   child: Text("Pick Video"),
                                 ),
@@ -205,7 +233,11 @@ class _AddJobPageState extends State<AddJobPage> {
                       ),
                       SizedBox(height: 20),
                       if (pickedFile != null)
-                        Text("Video file selected : ${pickedFile}"),
+                        Image.file(
+                          File(videoThumbnail!.path),
+                          height: 250,
+                          width: double.infinity,
+                        ),
                     ],
                   ),
                 ],

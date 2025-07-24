@@ -221,20 +221,16 @@ class _SearchScreenState extends State<SearchScreen> {
                     if (kIsWeb) {
                       // Web routing if needed
                     } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CardDetailsScreen(users: users),
-                        ),
-                      );
+
                     }
                   },
-                  child: ListDetailsCardForWeb(
+                  child:  ListDetailsCardForWeb(
                     id: users.id,
                     name: users.name,
                     contact: users.contact,
                     work: users.type,
                     image: users.image,
+                    distance: searchController.allResults.isNotEmpty ? 0.0 : users.distance,
                   ),
                 );
               },

@@ -101,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!Platform.isAndroid) {
       print("object");
     }
+    adController.fetchAds();
     // _searchController.addListener(_onChange);
   }
 
@@ -126,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   navigateToProfileScreen(UserModal user) {
     if (!isSkiaWeb) {
-      context.push(RoutsName.profileScreen, extra: user);
+      context.go(RoutsName.profileScreen, extra: user);
     } else {
       context.push(RoutsName.profileScreen, extra: user);
     }
@@ -158,8 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             // navigateToProfileScreen(userModal);
                             screen == "user_dashboard"
-                                ? context.push(RoutsName.profileScreen)
-                                : context.push(RoutsName.typeDashboard);
+                                ? customNavigate(context,RoutsName.profileScreen,null)
+                                : customNavigate(context,RoutsName.typeDashboard,null);
                           },
                           child: CircleAvatar(
                             radius: 25,
@@ -278,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Expanded(
                                                     child: Image.network(
                                                       ad.adImage!,
-                                                      fit: BoxFit.cover,
+                                                      fit: BoxFit.contain,
                                                       width: double.infinity,
                                                     ),
                                                   ),
@@ -480,6 +481,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           name: users.name,
                                                           contact:
                                                               users.contact,
+                                                          distance:
+                                                              users.distance,
                                                         ),
                                                   );
                                                 },

@@ -172,9 +172,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         context.pushReplacement("${RoutsName.bottomNavigation}/0");
       } else {
+        context.pushReplacement("${RoutsName.bottomNavigation}/0");
         Utils.showAppSnackBar(
           context,
-          "User role not found in database.",
+          "Login successfully",
           backgroundColor: Colors.red,
         );
       }
@@ -272,20 +273,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 20),
                   CustomButton(
+                    textColor: Colors.black,
                     backgroundColor: backgroundColor,
                     label: "Login",
                     onPressed: _loginWithEmailAndPassword,
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 15),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton(
-                        onPressed: (){
-                          context.go(RoutsName.registrationScreen);
+                      InkWell(
+                        onTap: (){
+                          context.push(RoutsName.forgotPassword);
                         },
                         child: Text(
-                          "I have,t Account? Register",
+                          "Forgot Password?",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: (){
+                            context.push(RoutsName.registrationScreen);
+
+                        },
+                        child: Text(
+                          "I haven't Account? Register",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),

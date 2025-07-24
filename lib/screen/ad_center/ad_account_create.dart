@@ -56,10 +56,6 @@ class _AdRegisterScreenState extends State<AdRegisterScreen> {
     final isSmallScreen = screenSize.width < 600;
     final isVerySmallScreen = screenSize.width < 400;
 
-
-
-
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:am_user/widgets/constants/const.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_compress/video_compress.dart';
 import '../controller/media_controllers/media_controller.dart';
@@ -15,9 +17,9 @@ class AddPostScreen extends StatefulWidget {
 }
 
 class _AddPostScreenState extends State<AddPostScreen> {
-
   final ImagePicker picker = ImagePicker();
   final MediaController mediaController = Get.find();
+  final controller = Get.find<GetUserController>();
   final UserModal user = Get.find<GetUserController>().myUser!;
 
   File? selectedFile;
@@ -49,7 +51,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       }
 
       setState(() {});
-    } catch(e){
+    } catch (e) {
       rethrow;
     }
   }
@@ -62,9 +64,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
     await mediaController.uploadSingleMedia(
       user: user,
-      file:isVideo ? compressedVideo!.file! : selectedFile!,
+      file: isVideo ? compressedVideo!.file! : selectedFile!,
       isVideo: isVideo,
     );
+
+    await controller.getUser();
+    context.pop();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -81,10 +86,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   MediaInfo? compressedVideo;
 
-  Future<void> compressVideo(String path)async {
+  Future<void> compressVideo(String path) async {
     final info = await VideoCompress.compressVideo(
       path,
-      quality: VideoQuality.MediumQuality, // Options: Low, Medium, High, VeryHigh
+      quality: VideoQuality.MediumQuality,
+      // Options: Low, Medium, High, VeryHigh
       deleteOrigin: false, // Set true to delete original file
     );
 
@@ -105,7 +111,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Upload Media")),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        title: Text("Upload Media", style: TextStyle(color: Colors.white)),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -113,27 +122,31 @@ class _AddPostScreenState extends State<AddPostScreen> {
             SwitchListTile(
               title: Text(
                 "Upload as Video",
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: TextStyle(fontSize: 18, color: Colors.black),
               ),
               value: isVideo,
               onChanged: (val) => setState(() => isVideo = val),
               activeColor: Colors.blue,
               activeTrackColor: Colors.blue.shade100,
               inactiveThumbColor: Colors.grey,
-              inactiveTrackColor: Colors.grey.shade100,
+              inactiveTrackColor: Colors.grey.shade300,
               contentPadding: EdgeInsets.zero,
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
-              ),
-              onPressed: pickSingleFile,
-              child: Text(
-                "Pick ${isVideo ? 'Video' : 'Image'}",
-                style: TextStyle(color: Colors.white),
+                onPressed: pickSingleFile,
+                child: Text(
+                  "Pick ${isVideo ? 'Video' : 'Image'}",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
             if (selectedFile != null)
@@ -141,20 +154,26 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child:
                     isVideo
-                        ? const Icon(Icons.videocam, size: 100)
+                        ? const Icon(Icons.videocam, size: 150)
                         : Image.file(selectedFile!, height: 150),
               ),
-            ElevatedButton(
-              onPressed: upload,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton(
+                onPressed: upload,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
-              ),
-              child:Obx(() => mediaController.isUploading.value
-                    ? const CircularProgressIndicator()
-                    : Text("Upload", style: TextStyle(color: Colors.white)),
+                child: Obx(
+                  () =>
+                      mediaController.isUploading.value
+                          ? const CircularProgressIndicator()
+                          : Text("Upload", style: TextStyle(color: Colors.white)),
+                ),
               ),
             ),
           ],

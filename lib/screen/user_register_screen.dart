@@ -38,12 +38,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Auth auth = Auth();
   UserMethod userMethod = UserMethod();
-
-
   bool _obscurePassword = true;
-
   Uint8List userImage = Uint8List(0) ;
-
 
   Future<void> _submitForm() async {
     showDialog(

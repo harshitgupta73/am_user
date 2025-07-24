@@ -4,6 +4,7 @@ class AllUserModal {
   final String type;
   final String id;// "Shop", "Driver", or "Worker"
   final String? image;
+  final double? distance;
 
   AllUserModal({
     required this.name,
@@ -11,6 +12,7 @@ class AllUserModal {
     required this.type,
     required this.id,
     this.image,
+    this.distance,
   });
   Map<String, dynamic> toMap() {
     return {
@@ -19,6 +21,7 @@ class AllUserModal {
       'type': type,
       'id': id,
       'image': image,
+      'distance': distance,
     };
   }
 

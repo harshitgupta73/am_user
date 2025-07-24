@@ -98,6 +98,7 @@ class GetUserController extends GetxController {
   }
 
   Future<void> loadUserFromFirestore() async {
+    isLoading.value=true;
     final uid = await SharePreferencesMethods().getUid();
     final userType = await SharePreferencesMethods().getUserType();
     final _firestore = FirebaseFirestore.instance;
@@ -127,6 +128,9 @@ class GetUserController extends GetxController {
       default:
         print("Unknown userType: $userType");
     }
+    isLoading.value=false;
   }
+
+
 
 }

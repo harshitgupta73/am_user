@@ -4,6 +4,7 @@ import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/driver_modal.dart';
 import 'package:am_user/modals/worker_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geoflutterfire3/geoflutterfire3.dart';
 import 'package:geolocator/geolocator.dart';
@@ -25,6 +26,7 @@ class Controller extends GetxController {
   RxBool isLoading = false.obs;
 
   final allUsers = <AllUserModal>[].obs;
+  RxDouble distance = 0.0.obs;
 
   final currDistrict = "".obs;
 
@@ -229,10 +231,21 @@ class Controller extends GetxController {
     // }
 
     final permission = await Permission.location.request();
+    final phonePermission= await Permission.phone.request();
+    final cameraPermission= await Permission.camera.request();
+    final storagePermission= await Permission.storage.request();
 
     if (!permission.isGranted) {
-      Get.snackbar("Permission Denied", "Location permission is required");
-      return;
+      Permission.location.request();
+    }
+    if(!phonePermission.isGranted){
+      Permission.phone.request();
+    }
+    if(!cameraPermission.isGranted){
+      Permission.camera.request();
+    }
+    if(!storagePermission.isGranted){
+      Permission.storage.request();
     }
 
     Position position = await Geolocator.getCurrentPosition(
@@ -257,14 +270,19 @@ class Controller extends GetxController {
       );
 
       await for (var docs in shopStream) {
+
         for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
+            GeoPoint geopoint = data['position']['geopoint'];
+          distBWTwoPoints(position.latitude, position.longitude, geopoint.latitude, geopoint.longitude);
+          print("distance= $distance");
           tempList.add(AllUserModal(
             name: data['shopName'] ?? 'Unnamed Shop',
             contact: data['contactNo'] ?? '',
             type: 'Shop',
             id: doc.id,
             image: data['shopImage'],
+            distance: distance.value,
           ));
         }
         break; // Only need first event from stream
@@ -283,12 +301,15 @@ class Controller extends GetxController {
       await for (var docs in driverStream) {
         for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
+          GeoPoint geopoint = data['position']['geopoint'];
+          distBWTwoPoints(position.latitude, position.longitude, geopoint.latitude, geopoint.longitude);
           tempList.add(AllUserModal(
             name: data['driverName'] ?? 'Unnamed Driver',
             contact: data['driverContact'] ?? '',
             type: 'Driver',
             id: doc.id,
             image: data['driverImage'],
+            distance: distance.value,
           ));
         }
         break;
@@ -307,12 +328,15 @@ class Controller extends GetxController {
       await for (var docs in workerStream) {
         for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
+          GeoPoint geopoint = data['position']['geopoint'];
+          distBWTwoPoints(position.latitude, position.longitude, geopoint.latitude, geopoint.longitude);
           tempList.add(AllUserModal(
             name: data['workerName'] ?? 'Unnamed Worker',
             contact: data['workerContact'] ?? '',
             type: 'Worker',
             id: doc.id,
             image: data['workerImage'],
+            distance: distance.value,
           ));
         }
         break;
@@ -415,5 +439,9 @@ class Controller extends GetxController {
 
       driverList.value = drivers;
     }
+  }
+
+  void distBWTwoPoints(double lat1, double lon1, double lat2, double lon2) {
+    distance.value= Geolocator.distanceBetween(lat1, lon1, lat2, lon2) / 1000;
   }
 }

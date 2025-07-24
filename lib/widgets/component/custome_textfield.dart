@@ -12,6 +12,7 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
   final int maxLines;
+  final Color? cursorColor;
   final double? fontSize;
   final Color? color;
 
@@ -26,6 +27,7 @@ class CustomTextField extends StatefulWidget {
     this.isPassword = false,
     this.controller,
     this.onChanged,
+    this.cursorColor,
     this.validator,
     this.readOnly = false,
     this.maxLines = 1,
@@ -50,7 +52,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       validator: widget.validator,
       readOnly: widget.readOnly,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
-
+      cursorColor: widget.cursorColor,
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: TextStyle(color: widget.color),

@@ -38,52 +38,17 @@ class _VideoThumbnailPlayerState extends State<VideoThumbnailPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    // return AspectRatio(
-    //   aspectRatio: _showPlayer
-    //       ? _videoController.value.aspectRatio
-    //       : 16 / 9, // fallback if thumbnail doesn't give aspect
-    //   child: _showPlayer
-    //       ? _videoController.value.isInitialized
-    //       ? Stack(
-    //     alignment: Alignment.center,
-    //     children: [
-    //       VideoPlayer(_videoController),
-    //       if (!_videoController.value.isPlaying)
-    //         IconButton(
-    //           icon: Icon(Icons.play_circle, size: 64, color: Colors.white),
-    //           onPressed: () {
-    //             setState(() {
-    //               _videoController.play();
-    //             });
-    //           },
-    //         ),
-    //     ],
-    //   )
-    //       : Center(child: CircularProgressIndicator())
-    //       : Stack(
-    //     fit: StackFit.expand,
-    //     children: [
-    //         Image.network(widget.videoUrl, fit: BoxFit.cover),
-    //       Center(
-    //         child: IconButton(
-    //           icon: Icon(Icons.play_circle_fill, size: 64, color: Colors.white),
-    //           onPressed: () {
-    //             setState(() {
-    //               _showPlayer = true;
-    //             });
-    //           },
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
-    return Center(
-      child: _isInitialized
-          ? AspectRatio(
-        aspectRatio: _videoController.value.aspectRatio,
-        child: VideoPlayer(_videoController),
-      )
-          : const Center(child: CircularProgressIndicator()),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _isInitialized
+              ? AspectRatio(
+            aspectRatio: _videoController.value.aspectRatio,
+            child: VideoPlayer(_videoController),
+          )
+              : CircularProgressIndicator(),
+        ],
+      ),
     );
   }
 }

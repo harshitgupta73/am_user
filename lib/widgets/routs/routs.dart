@@ -31,6 +31,7 @@ import '../../screen/chatList_screen.dart';
 import '../../screen/chat_screen.dart';
 import '../../screen/dash_bord_profile_screen.dart';
 import '../../screen/error_screen.dart';
+import '../../screen/forgot_password_page.dart';
 import '../../screen/home_screen.dart';
 import '../../screen/profile_screen.dart';
 import '../../screen/shop_register_screen.dart';
@@ -210,6 +211,13 @@ final GoRouter router = GoRouter(
 
     ),
     GoRoute(
+      path: RoutsName.forgotPassword,
+      builder: (context, state) {
+        return ForgotPasswordPage();
+      },
+
+    ),
+    GoRoute(
       path: RoutsName.adLoginScreen,
       builder: (context, state) {
         // Safely extract DriverModal from state extra
@@ -253,5 +261,6 @@ class RoutsName{
  static String addJob = '/addJob';
  static String typeDashboard='/typeDashboard';
  static String selectedUsers='/selectedUsers';
+ static String forgotPassword='/forgotPassword';
 
 }

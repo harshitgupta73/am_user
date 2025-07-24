@@ -78,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               const SizedBox(width: 10),
               IconButton(onPressed: (){
-                context.go(RoutsName.allChats);
+                context.push(RoutsName.allChats);
               }, icon: Icon(Icons.arrow_back,color: Colors.black54,))
             ],
           ),

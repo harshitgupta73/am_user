@@ -16,7 +16,7 @@ class ShowLoadingIndicator extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(),
+            const CircularProgressIndicator(color: Colors.black,),
             if (message != null) ...[
               const SizedBox(height: 16),
               Text(

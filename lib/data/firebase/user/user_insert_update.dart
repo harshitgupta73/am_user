@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:am_user/widgets/constants/firebse_const/string_const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../../modals/userModal.dart';
 
@@ -99,6 +100,49 @@ class UserMethod{
       isVideo ? 'Videos' : 'Images': currentMedia,
     });
   }
+
+  Future<void> deleteFileFromStorage(String url) async {
+    try {
+      final ref = FirebaseStorage.instance.refFromURL(url);
+      await ref.delete();
+      // print("Deleted from storage: $url");
+    } catch (e) {
+      // print("Error deleting file from storage: $e");
+    }
+  }
+
+  Future<void> deleteMediaFromUserDoc({
+    required String userId,
+    required String url,
+    required bool isImage,
+  }) async {
+    final userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
+
+    try {
+      final field = isImage ? 'Images' : 'Videos';
+
+      await userRef.update({
+        field: FieldValue.arrayRemove([url])  // ✅ remove from Firestore array
+      });
+
+      // print("Removed from Firestore: $url");
+
+      await deleteFileFromStorage(url);      // ✅ remove from storage
+
+    } catch (e) {
+      // print("Error removing media from user document: $e");
+    }
+  }
+
+  Future<void> forgotPassword(String email) async {
+    try{
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      print("Password reset email sent.");
+    }catch(e){
+      print("Error : $e");
+    }
+  }
+
 
 
 }

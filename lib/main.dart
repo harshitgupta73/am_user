@@ -6,6 +6,7 @@ import 'package:am_user/controller/job_controller/job_controller.dart';
 import 'package:am_user/controller/media_controllers/media_controller.dart';
 import 'package:am_user/controller/user_provider/get_user_provider.dart';
 import 'package:am_user/widgets/routs/routs.dart'; // should export 'GoRouter router'
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // await FirebaseAppCheck.instance.activate( // or AndroidProvider.debug for dev
+  // );
+
 
   Get.put(GetUserController());
   Get.put(MediaController());
