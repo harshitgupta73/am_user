@@ -1,15 +1,11 @@
-import 'dart:convert';
 import 'package:am_user/data/firebase/shop_method/shope_methods.dart';
 import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/driver_modal.dart';
 import 'package:am_user/modals/worker_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geoflutterfire3/geoflutterfire3.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import '../data/firebase/driver_methods/driver_insert_update.dart';
 import '../data/firebase/worker_methods/worker_method.dart';

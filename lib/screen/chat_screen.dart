@@ -1,4 +1,5 @@
 import 'package:am_user/controller/controllers.dart';
+import 'package:am_user/controller/image_picker_controller.dart';
 import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/routs/routs.dart';
@@ -22,6 +23,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
+  final ImagePickerController imagePickerController = ImagePickerController();
   final controller = Get.find<Controller>();
   final chatController = Get.find<ChatController>();
   AllUserModal? user;
@@ -88,9 +90,9 @@ class _ChatScreenState extends State<ChatScreen> {
           margin: Responsive.isDesktop(context)?EdgeInsets.symmetric(horizontal:size.width/4 ):EdgeInsets.symmetric(horizontal: 5),
           child: Column(
             children: [
-              Obx (()
-                => Expanded(
-                  child: ListView.builder(
+              Expanded(
+                child:Obx (()
+                =>  ListView.builder(
                     reverse: true,
                     itemCount: messages.length,
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -133,22 +135,35 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: Colors.grey[850],
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        child: TextFormField(
-                          controller: _messageController,
-                          style: const TextStyle(color: Colors.white),
-                          maxLines: null,
-                          keyboardType: TextInputType.multiline,
-                          textInputAction: TextInputAction.newline,
-                          decoration: const InputDecoration(
-                            hintText: "Type a message...",
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
-                            suffixIcon: Icon(Icons.attach_file,color: Colors.white,)
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _messageController,
+                                style: const TextStyle(color: Colors.white),
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
+                                textInputAction: TextInputAction.newline,
+                                decoration: const InputDecoration(
+                                  hintText: "Type a message...",
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: const Icon(Icons.attach_file, color: Colors.white),
+                              onPressed: () {
+                                imagePickerController.getImage();
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+
+                    const SizedBox(width: 8),
                     CircleAvatar(
                       backgroundColor: Colors.green,
                       radius: 25,

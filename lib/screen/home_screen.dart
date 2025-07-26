@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ),
                                                   ),
                                                 if (ad.adVideo != null)
-                                                  Center(child: VideoThumbnailPlayer(videoUrl: ad.adVideo!))
+                                                  Expanded(child: VideoThumbnailPlayer(videoUrl: ad.adVideo!))
                                               ],
                                             ),
                                           );
@@ -370,9 +370,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           : Colors.grey,
                                                 ),
                                               ),
-                                            );
+                                             );
                                           }).toList(),
-                                    ),
+                                     ),
 
                                     Container(
                                       margin: EdgeInsets.only(left: 20),

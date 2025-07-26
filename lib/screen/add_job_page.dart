@@ -90,18 +90,19 @@ class _AddJobPageState extends State<AddJobPage> {
             ),
             SizedBox(height: 20),
             // Tab Views
-            Container(
-              height: 600,
+            Expanded(
               // Set a fixed height or wrap in Expanded if in a flexible parent
               child: TabBarView(
                 children: [
                   // TEXT Tab
                   SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                      left: 10, right: 10, top: 10,
+                    ),
                     child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextField(
+                        children: [
+                          TextField(
                               focusNode: _focusNode,
                               cursorColor: Colors.black,
                               controller: name,
@@ -114,10 +115,9 @@ class _AddJobPageState extends State<AddJobPage> {
                                 labelStyle: TextStyle(color: Colors.black)
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
                   // IMAGE Tab
                   Column(

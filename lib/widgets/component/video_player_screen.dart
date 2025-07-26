@@ -38,17 +38,11 @@ class _VideoThumbnailPlayerState extends State<VideoThumbnailPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _isInitialized
-              ? AspectRatio(
+    return _isInitialized
+        ? AspectRatio(
             aspectRatio: _videoController.value.aspectRatio,
             child: VideoPlayer(_videoController),
           )
-              : CircularProgressIndicator(),
-        ],
-      ),
-    );
+        : Center(child: CircularProgressIndicator());
   }
 }

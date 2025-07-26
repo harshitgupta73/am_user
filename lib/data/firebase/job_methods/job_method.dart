@@ -18,7 +18,7 @@ class JobMethods {
   /// Get all jobs from Firestore
   Future<List<JobModel>> getAllJobs() async {
     try {
-      final snapshot = await jobCollection.get();
+      final snapshot = await jobCollection.orderBy('createdAt', descending: true).get();
       return snapshot.docs
           .map((doc) => JobModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
