@@ -387,6 +387,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                                     await driverMethods.insertDriver(driver, randomId);
                                     await sharedPreferencesMethods.clearUserData();
                                     await sharedPreferencesMethods.saveUserTypeAndUid("drivers", randomId);
+                                    await userController.loadUserFromFirestore();
                                   }
 
                                   controller.stopLoading();
@@ -396,7 +397,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        isEditing ? 'Driver updated successfully' : 'Driver added successfully',
+                                        isEditing ? 'Driver updated successfully' : 'Driver added successfully for one year',
                                       ),
                                       backgroundColor: Colors.green,
                                     ),

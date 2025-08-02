@@ -26,18 +26,7 @@ class _CurvedNavBarState extends State<CurvedNavBar> {
   late int _selectedIndex;
 
   late List<Widget> pages;
-  // final dummyWorker = WorkerModal(
-  //   workerName: 'Amit Kumar',
-  //   address: '456 Gandhi Nagar, Delhi',
-  //   otherSkills: 'Plumbing, Painting',
-  //   selectedGender: 'Male',
-  //   stateValue: 'Delhi',
-  //   distValue: 'Central Delhi',
-  //   jobWorkCategory: 'Construction',
-  //   jobWork: 'Mason',
-  //   // If you don’t have an actual image, you can skip this or use a placeholder image.
-  //   workerImage: null, // Or use Uint8List.fromList(...) if you have image bytes
-  // );
+
 
 
    List<WorkerModal> workers = [];

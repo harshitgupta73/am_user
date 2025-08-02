@@ -4,15 +4,15 @@ import 'package:am_user/controller/ad_controller/ad_controller.dart';
 import 'package:am_user/controller/controllers.dart';
 import 'package:am_user/controller/job_controller/job_controller.dart';
 import 'package:am_user/controller/media_controllers/media_controller.dart';
+import 'package:am_user/controller/price_controller.dart';
 import 'package:am_user/controller/user_provider/get_user_provider.dart';
-import 'package:am_user/widgets/routs/routs.dart'; // should export 'GoRouter router'
-import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:am_user/widgets/routs/routs.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controller/chat_controller/chat_controller.dart';
 import 'controller/image_picker_controller.dart';
+import 'controller/location_controller.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -20,10 +20,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // await FirebaseAppCheck.instance.activate( // or AndroidProvider.debug for dev
-  // );
 
-
+  Get.put(LocationController());
   Get.put(GetUserController());
   Get.put(MediaController());
   Get.put(Controller());
@@ -31,12 +29,22 @@ void main() async {
   Get.put(ImagePickerController());
   Get.put(JobController());
   Get.put(AdController());
+  Get.put(PriceController());
 
-  if(kIsWeb) {
-    final controller = Get.find<Controller>();
-    controller.onInit();
-    print("kjdjbj");
-  }
+  final controller = Get.find<GetUserController>();
+  controller.getUser();
+
+  // rgb(37, 150, 190)
+  //#449a26
+
+  //#0171b9
+  //rgba(1,113,185,255)
+
+
+  // if(kIsWeb) {
+  //   final controller = Get.find<Controller>();
+  //   controller.onInit();
+  // }
   runApp(MyApp());
 }
 
@@ -45,7 +53,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp.router(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Am User',
       theme: ThemeData.dark().copyWith(
@@ -58,10 +66,10 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.black,
       ),
-      // routerConfig: router,
-      routerDelegate: router.routerDelegate,
-      routeInformationParser: router.routeInformationParser,
-      routeInformationProvider: router.routeInformationProvider,
+      routerConfig: router,
+      // routerDelegate: router.routerDelegate,
+      // routeInformationParser: router.routeInformationParser,
+      // routeInformationProvider: router.routeInformationProvider,
     );
   }
 }

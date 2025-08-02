@@ -5,6 +5,7 @@ import 'package:am_user/widgets/constants/firebse_const/string_const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../../../modals/price_model.dart';
 import '../../../modals/userModal.dart';
 
 
@@ -143,6 +144,16 @@ class UserMethod{
     }
   }
 
+  Stream<PriceModel> getPrice() {
+    return FirebaseFirestore.instance.collection("price").limit(1).snapshots().map((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        final data = snapshot.docs.first.data();
+        return PriceModel.fromMap(data, snapshot.docs.first.id);
+      } else {
+        throw Exception("No price data found");
+      }
+    });
+  }
 
 
 }

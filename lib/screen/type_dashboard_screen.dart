@@ -6,6 +6,9 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import '../controller/user_provider/get_user_provider.dart';
+import '../modals/driver_modal.dart';
+import '../modals/shopModal.dart';
+import '../modals/worker_modal.dart';
 import '../responsive/reponsive_layout.dart';
 import '../widgets/component/reel_conatiner.dart';
 import '../widgets/constants/const.dart';
@@ -44,16 +47,22 @@ class _TypeDashboardScreenState extends State<TypeDashboardScreen> {
     super.initState();
     userController.loadUserFromFirestore();
   }
+  DriverModal? driver;
+  WorkerModal? worker;
+  ShopModal? shop;
 
   @override
   Widget build(BuildContext context) {
     String type = "";
     if (userController.shopModal.value != null) {
       type = 'Shop';
+      shop=userController.shopModal.value;
     } else if (userController.driverModal.value != null) {
       type = 'Driver';
+      driver=userController.driverModal.value;
     } else if (userController.workerModal.value != null) {
       type = 'Worker';
+      worker=userController.workerModal.value;
     } else {
       type = 'user';
     }
@@ -95,120 +104,99 @@ class _TypeDashboardScreenState extends State<TypeDashboardScreen> {
         backgroundColor: backgroundColor,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: Obx(() =>
+          child:
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Driver Info
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: NetworkImage(
-                          type == 'Shop'
-                              ? userController.shopModal.value!.shopImage ?? ''
-                              : type == 'Driver'
-                              ? userController.driverModal.value!.driverImage ??
-                              ''
-                              : userController.workerModal.value!.workerImage ??
-                              '',
+                  if (type == "Shop" && shop != null) ...[
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(shop!.shopImage!),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              type == 'Shop'
-                                  ? userController.shopModal.value!.shopName ??
-                                  ''
-                                  : type == 'Driver'
-                                  ? userController.driverModal.value!
-                                  .driverName ??
-                                  ''
-                                  : userController.workerModal.value!
-                                  .workerName ??
-                                  '',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              type == 'Shop'
-                                  ? userController.shopModal.value!.contactNo ??
-                                  ''
-                                  : type == 'Driver'
-                                  ? userController.driverModal.value!
-                                  .driverContact ??
-                                  ''
-                                  : userController.workerModal.value!
-                                  .workerContat ??
-                                  '',
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                            Text(
-                              type == 'Shop'
-                                  ? "Shop"
-                                  : type == "Driver"
-                                  ? "Driver"
-                                  : "Worker",
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                            Text(
-                              userController.myUser!.email!,
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                            Text(
-                              type == 'Shop'
-                                  ? userController.shopModal.value!
-                                  .shopAddress ??
-                                  ''
-                                  : type == 'Driver'
-                                  ? userController
-                                  .driverModal
-                                  .value!
-                                  .driverAddress ??
-                                  ''
-                                  : userController.workerModal.value!.address ??
-                                  '',
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                            type == "Shop"
-                                ? Text(
-                              "Shop timing: ${userController.shopModal.value!
-                                  .openingTime}-${userController.shopModal
-                                  .value!
-                                  .closingTime}",
-                              style: TextStyle(color: Colors.black),
-                            )
-                                : Container(height: 0),
-                            type == "Shop" &&
-                                userController.shopModal.value?.days != null &&
-                                userController.shopModal.value!.days!.isNotEmpty
-                                ? Text(
-                              "Opening days: ${userController.shopModal.value!
-                                  .days!
-                                  .join(', ')}",
-                              style: const TextStyle(color: Colors.black),
-                            )
-                                : const SizedBox.shrink(),
-                          ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(shop!.shopName ?? '-', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                              Text("Contact: ${shop!.contactNo ?? '-'}", style: const TextStyle(color: Colors.black)),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    _buildField("Proprietor", shop!.proprietorName),
+                    _buildField("Address", "${shop!.shopAddress}, ${shop!.distValue}, ${shop!.stateValue}"),
+                    _buildField("About Business", shop!.aboutBusiness),
+                    _buildField("Website", shop!.website),
+                    _buildField("Shop Item", shop!.shopItem),
+                    _buildField("Shop Type", shop!.shopType?.join(', ')),
+                    _buildField("Categories", shop!.shopCategorySet?.join(', ')),
+                    _buildField("Subcategories", shop!.shopSubcategoryMap?.entries.map((e) => "${e.key}: ${e.value.join(', ')}").join("\n")),
+                    _buildField("Working Hours", "${shop!.openingTime} - ${shop!.closingTime}"),
+                    _buildField("Working Days", shop!.days?.join(', ')),
+                  ],
+
+                  if (type == "Worker" && worker != null) ...[
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(worker!.workerImage!),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(worker!.workerName ?? '-', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                              Text("Contact: ${worker!.workerContat ?? '-'}", style: const TextStyle(color: Colors.black)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    _buildField("Gender", worker!.selectedGender),
+                    _buildField("Address", "${worker!.address}, ${worker!.distValue}, ${worker!.stateValue}"),
+                    _buildField("Skills", worker!.otherSkills),
+                    _buildField("Work Types", worker!.workType?.join(', ')),
+                  ],
+
+                  if (type == "Driver" && driver != null) ...[
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(driver!.driverImage!),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(driver!.driverName ?? '-', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                              Text("Contact: ${driver!.driverContact?? '-'}", style: const TextStyle(color: Colors.black)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    _buildField("Email", driver!.email),
+                    _buildField("Licence No", driver!.driverLicenceNo),
+                    _buildField("Vehicle No", driver!.vehicleNo),
+                    _buildField("Vehicle Name", driver!.vehicleName),
+                    _buildField("Vehicle Owner", driver!.vehicleOwnerName),
+                    _buildField("Address", "${driver!.driverAddress}, ${driver!.distValue}, ${driver!.stateValue}"),
+                    _buildField("Other Skill", driver!.driverOtherSkill),
+                    const SizedBox(height: 16),
+                    _buildImage(driver!.vehicleRcImage, "Vehicle RC Image"),
+                    _buildImage(driver!.drivingLicence, "Driving Licence"),
+                  ],
 
                   const SizedBox(height: 20),
-
-                  type == "Driver"
-                      ? _buildImage(
-                    userController.driverModal.value!.drivingLicence,
-                    "Driving Licence",
-                  )
-                      : SizedBox(height: 0),
                   const Divider(height: 30, color: Colors.black54),
 
                   // Toggle Tabs for Videos or Posts
@@ -349,9 +337,20 @@ class _TypeDashboardScreenState extends State<TypeDashboardScreen> {
               ),
           ),
         ),
+      );
+  }
+
+  Widget _buildField(String label, dynamic value) {
+    if (value == null || value.toString().trim().isEmpty) return SizedBox();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Text(
+        "$label: $value",
+        style: const TextStyle(color: Colors.black),
       ),
     );
   }
+
 
   Widget _buildImage(String? url, String label) {
     return Column(

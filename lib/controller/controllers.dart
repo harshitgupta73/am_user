@@ -1,3 +1,4 @@
+import 'package:am_user/controller/location_controller.dart';
 import 'package:am_user/data/firebase/shop_method/shope_methods.dart';
 import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/driver_modal.dart';
@@ -16,6 +17,8 @@ class Controller extends GetxController {
   final DriverMethods driverMethods = DriverMethods();
   final WorkerMethod workerMethod = WorkerMethod();
 
+  final locationController = Get.find<LocationController>();
+
   final shops = <ShopModal>[].obs;
   final drivers = <DriverModal>[].obs;
   final workers = <WorkerModal>[].obs;
@@ -26,16 +29,17 @@ class Controller extends GetxController {
 
   final currDistrict = "".obs;
 
-  RxString option=''.obs;
-  RxString selectedCategory=''.obs;
-  RxString selectedSubCategory=''.obs;
-  RxString selectedWorkerType= ''.obs;
+  RxString option = ''.obs;
+  RxString selectedCategory = ''.obs;
+  RxString selectedSubCategory = ''.obs;
+  RxString selectedWorkerType = ''.obs;
 
   RxList<ShopModal> shopList = <ShopModal>[].obs;
   RxList<WorkerModal> workerList = <WorkerModal>[].obs;
   RxList<DriverModal> driverList = <DriverModal>[].obs;
 
   void startLoading() => isLoading.value = true;
+
   void stopLoading() => isLoading.value = false;
 
   @override
@@ -48,7 +52,7 @@ class Controller extends GetxController {
     getAllUsers();
     fetchDataBasedOnSelection();
 
-    print("user");
+    // print("shop : ${shopList.join(", ")}");
   }
 
   Future<void> getAllShops() async {
@@ -69,281 +73,119 @@ class Controller extends GetxController {
     isLoading.value = false;
   }
 
-  // Future<void> getCurrentDistrict() async {
-  //   isLoading.value=true;
-  //   try {
-  //
-  //     final permission = await Permission.location.request();
-  //
-  //     if (!permission.isGranted) {
-  //       Get.snackbar("Permission Denied", "Location permission is required");
-  //       return;
-  //     }
-  //
-  //     Position position = await Geolocator.getCurrentPosition(
-  //       desiredAccuracy: LocationAccuracy.high,
-  //     );
-  //
-  //     List<Placemark> placemarks = await placemarkFromCoordinates(
-  //       position.latitude,
-  //       position.longitude,
-  //     );
-  //
-  //     // getSubLocality(position.latitude, position.longitude);
-  //
-  //     // print(placemarks.first);
-  //
-  //     if (placemarks.isNotEmpty) {
-  //       String? district = placemarks.first.subAdministrativeArea;
-  //       if (district != null && district.isNotEmpty) {
-  //         if (district != null && district.isNotEmpty) {
-  //           // Remove " Division" if it exists
-  //           district = district.replaceAll(" Division", "").trim();
-  //           currDistrict.value = district;
-  //           // print("Current District: $district");
-  //         }
-  //       } else {
-  //         Get.snackbar("Error", "Could not detect district");
-  //       }
-  //     }
-  //
-  //   } catch (e) {
-  //     Get.snackbar("Location Error", e.toString());
-  //   } finally{
-  //     isLoading.value=false;
-  //   }
-  // }
-
-  // Future<void> getSubLocality(double lat, double lon) async {
-  //   final String overpassQuery = '''
-  // [out:json][timeout:25];
-  // (
-  //   node["place"~"suburb|neighbourhood|locality"](around:500,$lat,$lon);
-  //   way["place"~"suburb|neighbourhood|locality"](around:500,$lat,$lon);
-  //   relation["place"~"suburb|neighbourhood|locality"](around:500,$lat,$lon);
-  // );
-  // out center;
-  // ''';
-  //
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse('https://overpass-api.de/api/interpreter'),
-  //       body: {'data': overpassQuery},
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //
-  //       if (data['elements'] != null && data['elements'].isNotEmpty) {
-  //         // Get the first matched sub-locality
-  //         final tags = data['elements'][0]['tags'];
-  //         final name = tags != null ? tags['name'] : 'Unknown';
-  //         // print('Sub-locality: $name');
-  //       } else {
-  //         // print('No sub-locality found nearby.');
-  //       }
-  //     } else {
-  //       // print('Failed to fetch data. Status: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     // print('Error occurred:$e');
-  //   }
-  // }
-
   Future<void> getAllUsers() async {
     isLoading.value = true;
 
-    // try {
-    //   final district = currDistrict.value;
-    //   if (district.isEmpty) {
-    //     Get.snackbar("Error", "District not found");
-    //     return;
-    //   }
-    //
-    //   List<AllUserModal> tempList = [];
-    //   // Fetch shops
-    //   final shopSnapshot =
-    //       await FirebaseFirestore.instance
-    //           .collection('Shops')
-    //           .where('distValue', isEqualTo: district)
-    //           .get();
-    //   for (var doc in shopSnapshot.docs) {
-    //     final data = doc.data();
-    //     tempList.add(
-    //       AllUserModal(
-    //         name: data['shopName'] ?? 'Unnamed Shop',
-    //         contact: data['contactNo'] ?? '',
-    //         type: 'Shop',
-    //         id: doc.id,
-    //         image: data['shopImage'],
-    //       ),
-    //     );
-    //   }
-    //
-    //   // Fetch drivers
-    //   final driverSnapshot =
-    //       await FirebaseFirestore.instance
-    //           .collection('drivers')
-    //           .where('distValue', isEqualTo: district)
-    //           .get();
-    //   for (var doc in driverSnapshot.docs) {
-    //     final data = doc.data();
-    //     tempList.add(
-    //       AllUserModal(
-    //         name: data['driverName'] ?? 'Unnamed Driver',
-    //         contact: data['driverContact'] ?? '',
-    //         type: 'Driver',
-    //         id: doc.id,
-    //         image: data['driverImage'],
-    //       ),
-    //     );
-    //   }
-    //
-    //   // Fetch workers
-    //   final workerSnapshot =
-    //       await FirebaseFirestore.instance
-    //           .collection('Workers')
-    //           .where('distValue', isEqualTo: district)
-    //           .get();
-    //   for (var doc in workerSnapshot.docs) {
-    //     final data = doc.data();
-    //     tempList.add(
-    //       AllUserModal(
-    //         name: data['workerName'] ?? 'Unnamed Worker',
-    //         contact: data['workerContact'] ?? '',
-    //         type: 'Worker',
-    //         id: doc.id,
-    //         image: data['workerImage'],
-    //       ),
-    //     );
-    //   }
-    //   tempList.shuffle(); // 🔀 Randomly intermix all users
-    //   allUsers.value = tempList;
-    // } catch (e) {
-    //   print("Error fetching users: $e");
-    //   return;
-    // } finally {
-    //   isLoading.value = false;
-    // }
+    await locationController.fetchCurrentLocation();
+    final lat = locationController.latitude.value;
+    final lng = locationController.longitude.value;
 
-    final permission = await Permission.location.request();
-    final phonePermission= await Permission.phone.request();
-    final cameraPermission= await Permission.camera.request();
-    final storagePermission= await Permission.storage.request();
-
-    if (!permission.isGranted) {
-      Permission.location.request();
-    }
-    if(!phonePermission.isGranted){
-      Permission.phone.request();
-    }
-    if(!cameraPermission.isGranted){
-      Permission.camera.request();
-    }
-    if(!storagePermission.isGranted){
-      Permission.storage.request();
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+    // print("lat = $lat , lng = $lng");
     double radiusInKm = 5.0;
 
     final geo = GeoFlutterFire();
-    GeoFirePoint center = geo.point(latitude: position.latitude, longitude: position.longitude);
+    GeoFirePoint center = geo.point(latitude: lat, longitude: lng);
 
     List<AllUserModal> tempList = [];
 
     try {
       /// 1. Query Shops
-      final shopStream = geo.collection(
-        collectionRef: FirebaseFirestore.instance.collection('Shops'),
-      ).within(
-        center: center,
-        radius: radiusInKm,
-        field: 'position',
-        strictMode: true,
-      );
+      final shopStream = geo
+          .collection(
+            collectionRef: FirebaseFirestore.instance.collection('Shops'),
+          )
+          .within(
+            center: center,
+            radius: radiusInKm,
+            field: 'position',
+            strictMode: true,
+          );
 
       await for (var docs in shopStream) {
-
         for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
-            GeoPoint geopoint = data['position']['geopoint'];
-          distBWTwoPoints(position.latitude, position.longitude, geopoint.latitude, geopoint.longitude);
+          GeoPoint geopoint = data['position']['geopoint'];
+          distBWTwoPoints(lat, lng, geopoint.latitude, geopoint.longitude);
           print("distance= $distance");
-          tempList.add(AllUserModal(
-            name: data['shopName'] ?? 'Unnamed Shop',
-            contact: data['contactNo'] ?? '',
-            type: 'Shop',
-            id: doc.id,
-            image: data['shopImage'],
-            distance: distance.value,
-          ));
+          tempList.add(
+            AllUserModal(
+              name: data['shopName'] ?? 'Unnamed Shop',
+              contact: data['contactNo'] ?? '',
+              type: 'Shop',
+              id: doc.id,
+              image: data['shopImage'],
+              distance: distance.value,
+            ),
+          );
         }
         break; // Only need first event from stream
       }
 
       /// 2. Query Drivers
-      final driverStream = geo.collection(
-        collectionRef: FirebaseFirestore.instance.collection('drivers'),
-      ).within(
-        center: center,
-        radius: radiusInKm,
-        field: 'position',
-        strictMode: true,
-      );
+      final driverStream = geo
+          .collection(
+            collectionRef: FirebaseFirestore.instance.collection('drivers'),
+          )
+          .within(
+            center: center,
+            radius: radiusInKm,
+            field: 'position',
+            strictMode: true,
+          );
 
       await for (var docs in driverStream) {
         for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
           GeoPoint geopoint = data['position']['geopoint'];
-          distBWTwoPoints(position.latitude, position.longitude, geopoint.latitude, geopoint.longitude);
-          tempList.add(AllUserModal(
-            name: data['driverName'] ?? 'Unnamed Driver',
-            contact: data['driverContact'] ?? '',
-            type: 'Driver',
-            id: doc.id,
-            image: data['driverImage'],
-            distance: distance.value,
-          ));
+          distBWTwoPoints(lat, lng, geopoint.latitude, geopoint.longitude);
+          tempList.add(
+            AllUserModal(
+              name: data['driverName'] ?? 'Unnamed Driver',
+              contact: data['driverContact'] ?? '',
+              type: 'Driver',
+              id: doc.id,
+              image: data['driverImage'],
+              distance: distance.value,
+            ),
+          );
         }
         break;
       }
 
       /// 3. Query Workers
-      final workerStream = geo.collection(
-        collectionRef: FirebaseFirestore.instance.collection('Workers'),
-      ).within(
-        center: center,
-        radius: radiusInKm,
-        field: 'position',
-        strictMode: true,
-      );
+      final workerStream = geo
+          .collection(
+            collectionRef: FirebaseFirestore.instance.collection('Workers'),
+          )
+          .within(
+            center: center,
+            radius: radiusInKm,
+            field: 'position',
+            strictMode: true,
+          );
 
       await for (var docs in workerStream) {
         for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
           GeoPoint geopoint = data['position']['geopoint'];
-          distBWTwoPoints(position.latitude, position.longitude, geopoint.latitude, geopoint.longitude);
-          tempList.add(AllUserModal(
-            name: data['workerName'] ?? 'Unnamed Worker',
-            contact: data['workerContact'] ?? '',
-            type: 'Worker',
-            id: doc.id,
-            image: data['workerImage'],
-            distance: distance.value,
-          ));
+          distBWTwoPoints(lat, lng, geopoint.latitude, geopoint.longitude);
+          tempList.add(
+            AllUserModal(
+              name: data['workerName'] ?? 'Unnamed Worker',
+              contact: data['workerContact'] ?? '',
+              type: 'Worker',
+              id: doc.id,
+              image: data['workerImage'],
+              distance: distance.value,
+            ),
+          );
         }
         break;
       }
 
       tempList.shuffle(); // 🔀 Random mix
       allUsers.value = tempList;
-      tempList.forEach(
-          (index) => print(index.toMap())
-      );
-
+      // tempList.forEach((index) => print(index.toMap()));
     } catch (e) {
       print("Error in geohash query: $e");
     } finally {
@@ -356,27 +198,29 @@ class Controller extends GetxController {
     if (option.value == "Shops") {
       print("djvdh");
       // Filter shops by category and subcategory
-      final filtered = shops.where((shop) {
-        final hasCategory = shop.shopCategorySet?.contains(selectedCategory.value) ?? false;
-        final hasSubcategory = shop.shopSubcategoryMap?[selectedCategory.value]
-            ?.contains(selectedSubCategory.value) ?? false;
-        return hasCategory && hasSubcategory;
-      }).toList();
+      final filtered =
+          shops.where((shop) {
+            final hasCategory =
+                shop.shopCategorySet?.contains(selectedCategory.value) ?? false;
+            final hasSubcategory =
+                shop.shopSubcategoryMap?[selectedCategory.value]?.contains(
+                  selectedSubCategory.value,
+                ) ??
+                false;
+            return hasCategory && hasSubcategory;
+          }).toList();
 
       shopList.value = filtered;
       print("djhb= ${shopList[0].days}");
-    }
-
-    else if (option.value == "Workers") {
+    } else if (option.value == "Workers") {
       // Filter workers by selected work types
-      final filtered = workers.where((worker) {
-        return worker.workType?.contains(selectedWorkerType.value) ?? false;
-      }).toList();
+      final filtered =
+          workers.where((worker) {
+            return worker.workType?.contains(selectedWorkerType.value) ?? false;
+          }).toList();
 
       workerList.value = filtered;
-    }
-
-    else if (option.value == "drivers") {
+    } else if (option.value == "drivers") {
       // Just assign all drivers
       driverList.value = drivers;
     }
@@ -385,59 +229,55 @@ class Controller extends GetxController {
   Future<void> fetchDataBasedOnSelection() async {
     if (option.value == "Shops") {
       // Fetch shops matching category and subcategory
-      final snapshot = await FirebaseFirestore.instance
-          .collection('Shops')
-          .where('shopCategorySet', arrayContains: selectedCategory.value)
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('Shops')
+              .where('shopCategorySet', arrayContains: selectedCategory.value)
+              .get();
 
-      shops.value = snapshot.docs
-          .map((doc) => ShopModal.fromJson(doc.data()))
-          .toList();
+      shops.value =
+          snapshot.docs.map((doc) => ShopModal.fromJson(doc.data())).toList();
 
       // Filter subcategory manually
-      List<ShopModal> filteredShops = shops.where((shop) {
-        final subMap = shop.shopSubcategoryMap;
-        if (subMap != null && subMap.containsKey(selectedCategory.value)) {
-          return subMap[selectedCategory.value]!
-              .contains(selectedSubCategory.value);
-        }
-        return false;
-      }).toList();
+      List<ShopModal> filteredShops =
+          shops.where((shop) {
+            final subMap = shop.shopSubcategoryMap;
+            if (subMap != null && subMap.containsKey(selectedCategory.value)) {
+              return subMap[selectedCategory.value]!.contains(
+                selectedSubCategory.value,
+              );
+            }
+            return false;
+          }).toList();
 
       shopList.value = filteredShops;
       print("dkhvd= ${shopList.length}");
-    }
-
-    else if (option.value == "Workers") {
+    } else if (option.value == "Workers") {
       // Fetch workers matching selected types
 
-        final snapshot = await FirebaseFirestore.instance
-            .collection('Workers')
-            .where('workType', arrayContains: selectedWorkerType.value)
-            .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('Workers')
+              .where('workType', arrayContains: selectedWorkerType.value)
+              .get();
 
-        List<WorkerModal> workers = snapshot.docs
-            .map((doc) => WorkerModal.fromJson(doc.data()))
-            .toList();
+      List<WorkerModal> workers =
+          snapshot.docs.map((doc) => WorkerModal.fromJson(doc.data())).toList();
 
-        workerList.value = workers;
-    }
-
-    else if (option.value == "drivers") {
+      workerList.value = workers;
+    } else if (option.value == "drivers") {
       // Fetch all drivers
-      final snapshot = await FirebaseFirestore.instance
-          .collection('drivers')
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance.collection('drivers').get();
 
-      List<DriverModal> drivers = snapshot.docs
-          .map((doc) => DriverModal.fromJson(doc.data()))
-          .toList();
+      List<DriverModal> drivers =
+          snapshot.docs.map((doc) => DriverModal.fromJson(doc.data())).toList();
 
       driverList.value = drivers;
     }
   }
 
   void distBWTwoPoints(double lat1, double lon1, double lat2, double lon2) {
-    distance.value= Geolocator.distanceBetween(lat1, lon1, lat2, lon2) / 1000;
+    distance.value = Geolocator.distanceBetween(lat1, lon1, lat2, lon2) / 1000;
   }
 }

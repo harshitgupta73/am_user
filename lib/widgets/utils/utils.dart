@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -22,19 +23,24 @@ class Utils{
 
  Future<void> dialNumber(String phoneNumber, BuildContext context) async {
    final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
-   try {
-     if (await canLaunchUrl(uri)) {
-       await launchUrl(uri);
-     } else {
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text("Cannot open dialer")),
-       );
+
+   final phonePermission = await Permission.phone.request();
+
+   if (phonePermission.isGranted) {
+     try {
+       if (await canLaunchUrl(uri)) {
+         await launchUrl(uri,mode: LaunchMode.externalApplication);
+       } else {
+         showAppSnackBar(context, "Cannot open dialer");
+       }
+     } catch (e) {
+       showAppSnackBar(context, "Error: $e");
+       print("Error: $e");
      }
-   } catch (e) {
-     ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(content: Text("Error: $e")),
-     );
-     print("Error: $e");
+   } else if (phonePermission.isPermanentlyDenied) {
+     await openAppSettings();
+   } else {
+     showAppSnackBar(context, "Phone permission is required to make a call.");
    }
  }
 }

@@ -1,5 +1,6 @@
 import 'package:am_user/controller/controllers.dart';
 import 'package:am_user/controller/user_provider/get_user_provider.dart';
+import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/chat_room_model.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/routs/routs.dart';
@@ -36,7 +37,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   void loadChats() async{
     await chatController.loadUserChats(userController.myUser!.userId!);
-    print("ChatRooms = ${chatController.chatRooms.length}");
+    // print("ChatRooms = ${chatController.chatRooms.length}");
   }
 
 
@@ -108,17 +109,23 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ),
           ),
           Expanded(
-              child: ListView.builder(
+              child: chatController.chatRooms.isEmpty ? Center(child: Text("Start Chatting !!",style: TextStyle(color: Colors.black),),) :  ListView.builder(
                 itemCount: chatController.chatRooms.length,
                 itemBuilder: (context, index) {
                   final chat = chatController.chatRooms[index];
                   print(chat.lastMessage);
                   final otherUserId = chatController.chatRooms[index].participants.firstWhere((
                       id) => id != userController.myUser!.userId);
-                  final otherUser = controller.allUsers.firstWhere((user) =>
-                  user.id == otherUserId);
+                  AllUserModal? otherUser;
+                  try {
+                    otherUser = controller.allUsers.firstWhere((user) => user.id == otherUserId);
+                    // print("dhdj= ${otherUser.name}");
+                  } catch (e) {
+                    // print("Error: $e");
+                    otherUser = null;
 
-                  return Container(
+                  }
+                  return otherUser== null ? Center(child: Text("Loading.."),) : Container(
                     margin: const EdgeInsets.symmetric(
                         vertical: 4, horizontal: 8),
                     decoration: BoxDecoration(
@@ -204,7 +211,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       onTap: () {
                         // Mark as read when tapped
                         context.push('${RoutsName.chatScreen}?currentUserId=${userController
-                            .myUser!.userId!}&targetUserId=${otherUserId}&targetUserName=${Uri.encodeComponent(otherUser.name)}');
+                            .myUser!.userId!}&targetUserId=${otherUserId}&targetUserName=${Uri.encodeComponent(otherUser!.name)}');
                       },
                     ),
                   );

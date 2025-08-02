@@ -381,6 +381,7 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                                         "Workers",
                                         workerId,
                                       );
+                                    await userController.loadUserFromFirestore();
                                     await controller.getAllUsers();
 
                                   }
@@ -392,7 +393,7 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                                       content: Text(
                                         isEditing
                                             ? 'Worker updated successfully'
-                                            : 'Worker added successfully',
+                                            : 'Worker added successfully for one year!',
                                       ),
                                       backgroundColor: Colors.green,
                                     ),

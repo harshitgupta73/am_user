@@ -15,17 +15,14 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  // List<WorkerModal> _filteredItems = [];
   final TextEditingController _searchController = TextEditingController();
-  final controller =Get.find<Controller>();
+  final controller = Get.find<Controller>();
   final SearchController searchController = Get.put(SearchController());
-
-  // late List<WorkerModal> allWorkers;
 
   @override
   void initState() {
     super.initState();
-
+    controller.getAllUsers();
     // _filteredItems = allWorkers;
     // _searchController.addListener();
   }
@@ -48,9 +45,17 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
+  void _triggerSearch() {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      searchController.runSearch(query);
+    } else {
+      searchController.allResults.clear();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.black, // status bar background
@@ -58,183 +63,146 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
     return Scaffold(
-      backgroundColor:backgroundColor,
+      backgroundColor: backgroundColor,
       body: Column(
         children: [
-          const SizedBox(height: 30,),
+          const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black,width: 1),
-                borderRadius: BorderRadius.circular(12)
+                border: Border.all(color: Colors.black, width: 1),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(21),
                     borderSide: BorderSide.none,
                   ),
+
                   hintText: "Search",
                   hintStyle: TextStyle(color: Colors.black),
                   suffixIcon: GestureDetector(
                     onTap: () {
-                      final query = _searchController.text.trim().toLowerCase();
-                      if (query.isNotEmpty) {
-                        searchController.runSearch(query);
-                      }
+                      _triggerSearch();
                     },
                     child: Icon(Icons.search, color: Colors.black),
                   ),
                 ),
                 cursorColor: Colors.black,
+                onSubmitted: (_) => _triggerSearch(),
                 controller: _searchController,
-                  onChanged: (value) {
-                    final query = value.trim().toLowerCase();
-                    if (query.isEmpty) {
-                      searchController.allResults.clear();
-                    } else {
-                      searchController.runSearch(query);
-                    }
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    searchController.allResults.clear();
+                  }
                 },
               ),
-            )
+            ),
           ),
           // Expanded(
-          //   child: searchController.allResults.isNotEmpty
-          //       ? GridView.builder(
-          //     physics: const NeverScrollableScrollPhysics(),
-          //     itemCount: searchController.allResults.length,
+          //   child: Obx(() => controller.allUsers.isEmpty ? CircularProgressIndicator() : GridView.builder(
+          //     // physics: const NeverScrollableScrollPhysics(),
+          //     itemCount:searchController.allResults.isNotEmpty
+          //         ? searchController.allResults.length
+          //         : controller.allUsers.length,
           //     shrinkWrap: true,
           //     padding: Responsive.isMobile(context)
           //         ? EdgeInsets.zero
           //         : EdgeInsets.all(20),
-          //     gridDelegate:
-          //     SliverGridDelegateWithFixedCrossAxisCount(
+          //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           //       crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
           //       crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-          //       mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-          //       childAspectRatio:
-          //       Responsive.isDesktop(context)
+          //       mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,-re
+          //       childAspectRatio: Responsive.isDesktop(context)
           //           ? 20 / 5
           //           : Responsive.isMobile(context)
           //           ? 14 / 5
           //           : 15 / 5,
           //     ),
           //     itemBuilder: (context, index) {
-          //       final users = searchController.allResults[index];
+          //       final users = searchController.allResults.isNotEmpty
+          //           ? searchController.allResults[index]
+          //           : controller.allUsers[index];
+          //
           //       return InkWell(
           //         onTap: () {
           //           if (kIsWeb) {
-          //             // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
+          //             // Web routing if needed
           //           } else {
-          //             Navigator.push(
-          //               context,
-          //               MaterialPageRoute(
-          //                 builder: (context) => CardDetailsScreen(users:AllUserModal(name: users.name, contact: users.contact, type: users.type, id: users.id, image: users.image,)),
-          //               ),
-          //             );
+          //
           //           }
           //         },
-          //         child: ListDetailsCardForWeb(
-          //             name: users.name,
-          //             contact: users.contact,
-          //             work: users.type,
-          //             image: users.image,
+          //         child:  ListDetailsCardForWeb(
           //           id: users.id,
-          //         ),
-          //       );
-          //     },
-          //   )
-          //       : GridView.builder(
-          //     physics: const NeverScrollableScrollPhysics(),
-          //     itemCount: controller.allUsers.length,
-          //     shrinkWrap: true,
-          //     padding: Responsive.isMobile(context)
-          //         ? EdgeInsets.zero
-          //         : EdgeInsets.all(20),
-          //     gridDelegate:
-          //     SliverGridDelegateWithFixedCrossAxisCount(
-          //       crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
-          //       crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-          //       mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-          //       childAspectRatio:
-          //       Responsive.isDesktop(context)
-          //           ? 20 / 5
-          //           : Responsive.isMobile(context)
-          //           ? 14 / 5
-          //           : 15 / 5,
-          //     ),
-          //     itemBuilder: (context, index) {
-          //       final users = controller.allUsers[index];
-          //       return InkWell(
-          //         onTap: () {
-          //           if (kIsWeb) {
-          //             // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
-          //           } else {
-          //             Navigator.push(
-          //               context,
-          //               MaterialPageRoute(
-          //                 builder: (context) => CardDetailsScreen(users:users),
-          //               ),
-          //             );
-          //           }
-          //         },
-          //         child: ListDetailsCardForWeb(
-          //           id:users.id,
-          //           work: users.type,
-          //           image: users.image,
           //           name: users.name,
           //           contact: users.contact,
+          //           work: users.type,
+          //           image: users.image,
+          //           distance: users.distance,
           //         ),
           //       );
           //     },
-          //   ),
+          //   )),
           // ),
           Expanded(
-            child: Obx(() => GridView.builder(
-              // physics: const NeverScrollableScrollPhysics(),
-              itemCount: searchController.allResults.isNotEmpty
-                  ? searchController.allResults.length
-                  : controller.allUsers.length,
-              shrinkWrap: true,
-              padding: Responsive.isMobile(context)
-                  ? EdgeInsets.zero
-                  : EdgeInsets.all(20),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
-                crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-                mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-                childAspectRatio: Responsive.isDesktop(context)
-                    ? 20 / 5
-                    : Responsive.isMobile(context)
-                    ? 14 / 5
-                    : 15 / 5,
-              ),
-              itemBuilder: (context, index) {
-                final users = searchController.allResults.isNotEmpty
-                    ? searchController.allResults[index]
-                    : controller.allUsers[index];
+            child: Obx(() {
+              if (searchController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator(color: Colors.black,));
+              }
 
-                return InkWell(
-                  onTap: () {
-                    if (kIsWeb) {
-                      // Web routing if needed
-                    } else {
+              final results =
+                  searchController.allResults.isNotEmpty
+                      ? searchController.allResults
+                      : controller.allUsers;
 
-                    }
-                  },
-                  child:  ListDetailsCardForWeb(
-                    id: users.id,
-                    name: users.name,
-                    contact: users.contact,
-                    work: users.type,
-                    image: users.image,
-                    distance: searchController.allResults.isNotEmpty ? 0.0 : users.distance,
-                  ),
-                );
-              },
-            )),
+              if (results.isEmpty) {
+                return const Center(child: Text("No results found"));
+              }
+
+              return GridView.builder(
+                itemCount: results.length,
+                shrinkWrap: true,
+                padding:
+                    Responsive.isMobile(context)
+                        ? EdgeInsets.zero
+                        : const EdgeInsets.all(20),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
+                  crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+                  mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
+                  childAspectRatio:
+                      Responsive.isDesktop(context)
+                          ? 20 / 5
+                          : Responsive.isMobile(context)
+                          ? 14 / 5
+                          : 15 / 5,
+                ),
+                itemBuilder: (context, index) {
+                  final user = results[index];
+
+                  return InkWell(
+                    onTap: () {
+                      if (kIsWeb) {
+                        // Navigate on web
+                      } else {
+                        // Navigate on mobile
+                      }
+                    },
+                    child: ListDetailsCardForWeb(
+                      id: user.id,
+                      name: user.name,
+                      contact: user.contact,
+                      work: user.type,
+                      image: user.image,
+                      distance: user.distance,
+                    ),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),

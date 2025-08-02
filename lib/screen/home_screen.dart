@@ -19,6 +19,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
@@ -50,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final TextEditingController _searchController = TextEditingController();
 
-  UserModal? userModal;
+  // UserModal? userModal;
 
   final slider = [
     BannerImageWidget(),
@@ -67,63 +68,82 @@ class _HomeScreenState extends State<HomeScreen> {
     UserModal? cachedData =
         await _sharePreferencesMethods.loadUserFromSharedPref();
     if (cachedData != null) {
-      userModal = cachedData;
-      setState(() {});
+      // userModal = cachedData;
+      userController.setMyUser(cachedData);
+      print("user = ${userController.myUser!.toJson()}");
+
+      // print('user casged = ${userModal!.toJson()}');
     }
     await userController.getUser();
-    userModal = userController.myUser;
+    // userModal = userController.myUser;
     print("user = ${userController.myUser!.name}");
-    if (userModal != null) {
-      _sharePreferencesMethods.saveUserToSharedPref(userModal!);
-      setState(() {});
+    if (userController.myUser != null) {
+      _sharePreferencesMethods.saveUserToSharedPref(userController.myUser!);
+
     }
   }
-
+getuserOnTheLoad()async{
+    await getUserData();
+    fun();
+}
   String screen = "";
+  String? type;
+  String? userImage;
+  String? name;
+  String? contact;
 
   void fun() {
-    if (userController.shopModal.value != null)
+
+    if (userController.shopModal.value != null){
+      type="Shop";
       screen = 'type_dashboard';
-    else if (userController.workerModal.value != null)
+      userImage= userController.shopModal.value!.shopImage;
+      name= userController.shopModal.value!.shopName;
+      contact= userController.shopModal.value!.contactNo;
+    }
+    else if (userController.workerModal.value != null){
+      type="Worker";
       screen = 'type_dashboard';
-    else if (userController.driverModal.value != null)
+      userImage= userController.workerModal.value!.workerImage;
+      name= userController.workerModal.value!.workerName;
+      contact= userController.workerModal.value!.workerContat;
+    }
+    else if (userController.driverModal.value != null){
+      type="Driver";
       screen = 'type_dashboard';
-    else
+      userImage= userController.driverModal.value!.driverImage;
+      name= userController.driverModal.value!.driverName;
+      contact= userController.driverModal.value!.driverContact;
+    }
+    else if(userController.myUser != null){
       screen = 'user_dashboard';
+      type="User";
+      userImage= userController.myUser!.image;
+      name= userController.myUser!.name;
+      contact= userController.myUser!.contact;
+      print("myuser = ${userController.myUser!.toJson()}");
+    }
+    setState(() {
+
+    });
+    print("type = $type");
   }
 
   @override
   void initState() {
     super.initState();
-    getUserData();
-    // print("_sharePreferencesMethods.getUserType() = ${_sharePreferencesMethods.getUserType()}");
-    fun();
+    getuserOnTheLoad();
+
+
     if (!Platform.isAndroid) {
       print("object");
     }
     adController.fetchAds();
     // _searchController.addListener(_onChange);
+
   }
 
   final controller = Get.put(Controller());
-
-  // void _onChange() {
-  //   final query = _searchController.text.toLowerCase();
-  //
-  //   setState(() {
-  //     // _filterList = workers.where((element) {
-  //     //   final jobMatch = element.jobWork
-  //     //       ?.split(',')
-  //     //       .any((e) => e.trim().toLowerCase().contains(query)) ??
-  //     //       false;
-  //
-  //       final nameMatch =
-  //           element.workerName?.toLowerCase().contains(query) ?? false;
-  //
-  //       return jobMatch || nameMatch;
-  //     }).toList();
-  //   });
-  // }
 
   navigateToProfileScreen(UserModal user) {
     if (!isSkiaWeb) {
@@ -136,367 +156,362 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black, // status bar background
+        statusBarIconBrightness: Brightness.dark, // icons: time, battery
+      ),
+    );
     // print(controller.allUsers.length);
     return Scaffold(
       backgroundColor: backgroundColor,
       body:
-          userModal == null
+          Obx(() => userController.myUser == null
               ? Center(child: CircularProgressIndicator())
               : Column(
-                children: [
-                  SizedBox(height: Responsive.isMobile(context) ? 10 : 30),
-                  SafeArea(
-                    minimum: const EdgeInsets.symmetric(horizontal: 10),
-                    bottom: true,
-                    child: Row(
-                      crossAxisAlignment:
-                          Responsive.isDesktop(context)
-                              ? CrossAxisAlignment.center
-                              : CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            // navigateToProfileScreen(userModal);
-                            screen == "user_dashboard"
-                                ? customNavigate(context,RoutsName.profileScreen,null)
-                                : customNavigate(context,RoutsName.typeDashboard,null);
-                          },
-                          child: CircleAvatar(
-                            radius: 25,
-                            backgroundImage:
-                                userModal?.image == null ||
-                                        userModal!.image!.isEmpty
-                                    ? AssetImage(logo)
-                                    : NetworkImage(userModal!.image!),
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          flex:
-                              Responsive.isMobile(context) ||
-                                      Responsive.isTab(context)
-                                  ? 4
-                                  : 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AutoSizeText(
-                                userModal!.name ?? "",
-                                style: TextStyle(
-                                  color: customTextColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                                stepGranularity: 0.1,
-                                minFontSize: 18,
-                              ),
-                              AutoSizeText(
-                                userModal!.contact ?? "",
-                                style: TextStyle(
-                                  color: customTextColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                                stepGranularity: 0.1,
-                                minFontSize: 14,
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (Responsive.isDesktop(context) ||
-                            Responsive.isTab(context))
-                          Expanded(
-                            flex: 10,
-                            child: CustomSearchbar(
-                              onTap: () {
-                                int index = 1;
-                                context.push(
-                                  "${RoutsName.bottomNavigation}/$index",
-                                );
-                              },
-                              controller: _searchController,
-                              label: "Search here",
+            children: [
+              SizedBox(height: Responsive.isMobile(context) ? 10 : 30),
+              SafeArea(
+                minimum: const EdgeInsets.symmetric(horizontal: 10),
+                bottom: true,
+                child: Row(
+                  crossAxisAlignment:
+                  Responsive.isDesktop(context)
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        // navigateToProfileScreen(userModal);
+                        screen == "user_dashboard"
+                            ? customNavigate(context,RoutsName.profileScreen,null)
+                            : customNavigate(context,RoutsName.typeDashboard,null);
+                      },
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundImage:
+                        userImage == null ? AssetImage('assets/images/amuser.jpeg') :NetworkImage(userImage!),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      flex:
+                      Responsive.isMobile(context) ||
+                          Responsive.isTab(context)
+                          ? 4
+                          : 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AutoSizeText(
+                            name ?? "",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
+                            stepGranularity: 0.1,
+                            minFontSize: 18,
                           ),
-                        IconButton(
-                          onPressed: () {
-                            //context.push(RoutsName.allChats, extra: workers);
-                            // context.push(RoutsName.);
-                          },
-                          icon: Icon(
-                            Icons.notifications,
-                            color: Colors.black54,
+                          AutoSizeText(
+                            contact ?? "",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                            stepGranularity: 0.1,
+                            minFontSize: 14,
                           ),
-                          color: customTextColor,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            //context.push(RoutsName.allChats, extra: workers);
-                            SharePlus.instance.share(
-                              ShareParams(
-                                text:
-                                    'check out my website https://example.com',
-                              ),
+                        ],
+                      ),
+                    ),
+                    if (Responsive.isDesktop(context) ||
+                        Responsive.isTab(context))
+                      Expanded(
+                        flex: 10,
+                        child: CustomSearchbar(
+                          onTap: () {
+                            int index = 1;
+                            context.push(
+                              "${RoutsName.bottomNavigation}/$index",
                             );
                           },
-                          icon: Icon(Icons.share, color: Colors.green),
-                          color: customTextColor,
+                          controller: _searchController,
+                          label: "Search here",
                         ),
-                        popUpMenu(),
-                        // IconButton(
-                        //   icon: const Icon(Icons.menu),
-                        //   onPressed: () {
-                        //     _scaffoldKey.currentState?.openEndDrawer();
+                      ),
+                    IconButton(
+                      onPressed: () {
+                        //context.push(RoutsName.allChats, extra: workers);
+                        SharePlus.instance.share(
+                          ShareParams(
+                            text:
+                            'check out my website https://example.com',
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.share, color: Colors.green),
+                      color: customTextColor,
+                    ),
+                    popUpMenu(),
+                    // IconButton(
+                    //   icon: const Icon(Icons.menu),
+                    //   onPressed: () {
+                    //     _scaffoldKey.currentState?.openEndDrawer();
+                    //   },
+                    // ),
+                  ],
+                ),
+              ),
+              Obx(
+                    () =>
+                adController.ads.isNotEmpty
+                    ? Expanded(
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: double.infinity,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      aspectRatio: 16 / 9,
+                      autoPlayInterval: Duration(seconds: 10),
+                    ),
+                    items:
+                    adController.ads.map((ad) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Card(
+                            elevation: 4,
+                            child: Column(
+                              children: [
+                                if (ad.adImage != null)
+                                  Expanded(
+                                    child: Image.network(
+                                      ad.adImage!,
+                                      fit: BoxFit.contain,
+                                      width: double.infinity,
+                                    ),
+                                  ),
+                                if (ad.adVideo != null)
+                                  Expanded(child: VideoThumbnailPlayer(videoUrl: ad.adVideo!))
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                )
+                    : Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // if (Responsive.isMobile(context)) CustomSearchbar(
+                        //   controller: _searchController,
+                        //   label: "Search here",
+                        //   onTap: () {
+                        //     int index = 1;
+                        //     context.push(RoutsName.searchScreen);
                         //   },
                         // ),
+                        if (Responsive.isMobile(context))
+                          const SizedBox(height: 10),
+
+                        CarouselSlider(
+                          items: slider,
+                          options: CarouselOptions(
+                            height:
+                            Responsive.isDesktop(context)
+                                ? 600
+                                : Responsive.isTab(context)
+                                ? 300
+                                : 200,
+
+                            autoPlay: true,
+                            autoPlayInterval: Duration(seconds: 3),
+                            autoPlayAnimationDuration: Duration(
+                              milliseconds: 800,
+                            ),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enableInfiniteScroll: true,
+                            // onPageChanged: (index, reason) {
+                            //   setState(() {
+                            //     _currentIndex = index;
+                            //   });
+                            // },
+                          ),
+                        ),
+
+                        SizedBox(height: 10),
+
+                        // Dots Indicator
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.center,
+                          children:
+                          slider.asMap().entries.map((entry) {
+                            return GestureDetector(
+                              onTap:
+                                  () => setState(
+                                    () =>
+                                _currentIndex =
+                                    entry.key,
+                              ),
+                              child: Container(
+                                width:
+                                _currentIndex == entry.key
+                                    ? 12.0
+                                    : 8.0,
+                                height:
+                                _currentIndex == entry.key
+                                    ? 12.0
+                                    : 8.0,
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 4.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color:
+                                  _currentIndex == entry.key
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        Container(
+                          margin: EdgeInsets.only(left: 20),
+                          child: AutoSizeText(
+                            "Recommended Services",
+                            minFontSize: 20,
+                            maxLines: 1,
+                            maxFontSize: 34,
+                            style: TextStyle(
+                              color: customTextColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize:
+                              Responsive.isDesktop(context)
+                                  ? 34
+                                  : 24,
+                              shadows: [
+                                BoxShadow(
+                                  color: Colors.orange,
+                                  offset: Offset(-1, 2),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        Obx(
+                              () =>
+                          controller.isLoading.value
+                              ? Center(
+                            child:
+                            CircularProgressIndicator(),
+                          )
+                              : GridView.builder(
+                            physics:
+                            const NeverScrollableScrollPhysics(),
+                            itemCount:
+                            controller.allUsers.length,
+                            shrinkWrap: true,
+                            padding:
+                            Responsive.isMobile(context)
+                                ? EdgeInsets.zero
+                                : EdgeInsets.all(20),
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount:
+                              Responsive.isMobile(
+                                context,
+                              )
+                                  ? 1
+                                  : 2,
+                              crossAxisSpacing:
+                              Responsive.isMobile(
+                                context,
+                              )
+                                  ? 0
+                                  : 10,
+                              mainAxisSpacing:
+                              Responsive.isMobile(
+                                context,
+                              )
+                                  ? 0
+                                  : 10,
+                              childAspectRatio:
+                              Responsive.isDesktop(
+                                context,
+                              )
+                                  ? 20 / 5
+                                  : Responsive.isMobile(
+                                context,
+                              )
+                                  ? 14 / 5
+                                  : 15 / 5,
+                            ),
+                            itemBuilder: (context, index) {
+                              final users =
+                              controller
+                                  .allUsers[index];
+                              print(
+                                "users = ${users.name}",
+                              );
+                              return InkWell(
+                                onTap: () {
+                                  if (kIsWeb) {
+                                    // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                            CardDetailsScreen(
+                                              users:
+                                              users,
+                                            ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child:
+                                ListDetailsCardForWeb(
+                                  id: users.id,
+                                  work: users.type,
+                                  image: users.image,
+                                  name: users.name,
+                                  contact:
+                                  users.contact,
+                                  distance:
+                                  users.distance,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Obx(
-                    () =>
-                        adController.ads.isNotEmpty
-                            ? Expanded(
-                              child: CarouselSlider(
-                                options: CarouselOptions(
-                                  height: double.infinity,
-                                  autoPlay: true,
-                                  enlargeCenterPage: true,
-                                  viewportFraction: 1.0,
-                                  aspectRatio: 16 / 9,
-                                  autoPlayInterval: Duration(seconds: 15),
-                                ),
-                                items:
-                                    adController.ads.map((ad) {
-                                      return Builder(
-                                        builder: (BuildContext context) {
-                                          return Card(
-                                            elevation: 4,
-                                            child: Column(
-                                              children: [
-                                                if (ad.adImage != null)
-                                                  Expanded(
-                                                    child: Image.network(
-                                                      ad.adImage!,
-                                                      fit: BoxFit.contain,
-                                                      width: double.infinity,
-                                                    ),
-                                                  ),
-                                                if (ad.adVideo != null)
-                                                  Expanded(child: VideoThumbnailPlayer(videoUrl: ad.adVideo!))
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    }).toList(),
-                              ),
-                            )
-                            : Expanded(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // if (Responsive.isMobile(context)) CustomSearchbar(
-                                    //   controller: _searchController,
-                                    //   label: "Search here",
-                                    //   onTap: () {
-                                    //     int index = 1;
-                                    //     context.push(RoutsName.searchScreen);
-                                    //   },
-                                    // ),
-                                    if (Responsive.isMobile(context))
-                                      const SizedBox(height: 10),
-
-                                    CarouselSlider(
-                                      items: slider,
-                                      options: CarouselOptions(
-                                        height:
-                                            Responsive.isDesktop(context)
-                                                ? 600
-                                                : Responsive.isTab(context)
-                                                ? 300
-                                                : 200,
-
-                                        autoPlay: true,
-                                        autoPlayInterval: Duration(seconds: 3),
-                                        autoPlayAnimationDuration: Duration(
-                                          milliseconds: 800,
-                                        ),
-                                        autoPlayCurve: Curves.fastOutSlowIn,
-                                        enableInfiniteScroll: true,
-                                        // onPageChanged: (index, reason) {
-                                        //   setState(() {
-                                        //     _currentIndex = index;
-                                        //   });
-                                        // },
-                                      ),
-                                    ),
-
-                                    SizedBox(height: 10),
-
-                                    // Dots Indicator
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children:
-                                          slider.asMap().entries.map((entry) {
-                                            return GestureDetector(
-                                              onTap:
-                                                  () => setState(
-                                                    () =>
-                                                        _currentIndex =
-                                                            entry.key,
-                                                  ),
-                                              child: Container(
-                                                width:
-                                                    _currentIndex == entry.key
-                                                        ? 12.0
-                                                        : 8.0,
-                                                height:
-                                                    _currentIndex == entry.key
-                                                        ? 12.0
-                                                        : 8.0,
-                                                margin: EdgeInsets.symmetric(
-                                                  vertical: 8.0,
-                                                  horizontal: 4.0,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color:
-                                                      _currentIndex == entry.key
-                                                          ? Colors.blue
-                                                          : Colors.grey,
-                                                ),
-                                              ),
-                                             );
-                                          }).toList(),
-                                     ),
-
-                                    Container(
-                                      margin: EdgeInsets.only(left: 20),
-                                      child: AutoSizeText(
-                                        "Recommended Services",
-                                        minFontSize: 20,
-                                        maxLines: 1,
-                                        maxFontSize: 34,
-                                        style: TextStyle(
-                                          color: customTextColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize:
-                                              Responsive.isDesktop(context)
-                                                  ? 34
-                                                  : 24,
-                                          shadows: [
-                                            BoxShadow(
-                                              color: Colors.orange,
-                                              offset: Offset(-1, 2),
-                                              blurRadius: 10,
-                                              spreadRadius: 1,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                    Obx(
-                                      () =>
-                                          controller.isLoading.value
-                                              ? Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              )
-                                              : GridView.builder(
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount:
-                                                    controller.allUsers.length,
-                                                shrinkWrap: true,
-                                                padding:
-                                                    Responsive.isMobile(context)
-                                                        ? EdgeInsets.zero
-                                                        : EdgeInsets.all(20),
-                                                gridDelegate:
-                                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount:
-                                                          Responsive.isMobile(
-                                                                context,
-                                                              )
-                                                              ? 1
-                                                              : 2,
-                                                      crossAxisSpacing:
-                                                          Responsive.isMobile(
-                                                                context,
-                                                              )
-                                                              ? 0
-                                                              : 10,
-                                                      mainAxisSpacing:
-                                                          Responsive.isMobile(
-                                                                context,
-                                                              )
-                                                              ? 0
-                                                              : 10,
-                                                      childAspectRatio:
-                                                          Responsive.isDesktop(
-                                                                context,
-                                                              )
-                                                              ? 20 / 5
-                                                              : Responsive.isMobile(
-                                                                context,
-                                                              )
-                                                              ? 14 / 5
-                                                              : 15 / 5,
-                                                    ),
-                                                itemBuilder: (context, index) {
-                                                  final users =
-                                                      controller
-                                                          .allUsers[index];
-                                                  print(
-                                                    "users = ${users.name}",
-                                                  );
-                                                  return InkWell(
-                                                    onTap: () {
-                                                      if (kIsWeb) {
-                                                        // context.push("${RoutsName.cardDetailScreen}?userData=$driver");
-                                                      } else {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    CardDetailsScreen(
-                                                                      users:
-                                                                          users,
-                                                                    ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    },
-                                                    child:
-                                                        ListDetailsCardForWeb(
-                                                          id: users.id,
-                                                          work: users.type,
-                                                          image: users.image,
-                                                          name: users.name,
-                                                          contact:
-                                                              users.contact,
-                                                          distance:
-                                                              users.distance,
-                                                        ),
-                                                  );
-                                                },
-                                              ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                  ),
-                ],
+                ),
               ),
+            ],
+          ) ,)
+
     );
   }
+
 
   void showMainCategoryMenu(context, Offset position) {
     final RenderBox overlay =
@@ -675,28 +690,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          // PopupMenuItem(
-          //     onTap: () {
-          //
-          //       navigateToProfileScreen(userModal!);
-          //     },
-          //     child: Row(
-          //       children: [
-          //         Container(
-          //           height: 40,
-          //           width: 40,
-          //           decoration: BoxDecoration(
-          //             borderRadius: BorderRadius.circular(12),
-          //               image: DecorationImage(
-          //                   image: AssetImage(
-          //                       "assets/images/d37b020e87945ad7f245e48df752ed03.jpg"),
-          //                   fit: BoxFit.cover)
-          //           ),
-          //         ),
-          //         SizedBox(width: 10,),
-          //         Text("Profile",style: TextStyle(color: Colors.black),)
-          //       ],
-          //     )),
           PopupMenuItem(
             onTap: () {
               context.push(RoutsName.adRegisterScreen);

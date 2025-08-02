@@ -23,6 +23,10 @@ class GetUserController extends GetxController {
   final Rxn<UserModal> _userModal = Rxn<UserModal>();
   UserModal? get myUser => _userModal.value;
 
+  void setMyUser(UserModal user) {
+    _userModal.value = user;
+  }
+
   Rxn<UserModal> otherUser = Rxn<UserModal>();
 
   @override

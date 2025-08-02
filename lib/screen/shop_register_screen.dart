@@ -575,6 +575,7 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                                       .clearUserData();
                                   await sharedPreferencesMethods
                                       .saveUserTypeAndUid("Shops", shopId);
+                                  await userController.loadUserFromFirestore();
                                 }
 
                                 imagePickerController.imagePath.value = '';
@@ -586,7 +587,7 @@ class _ShopRegisterScreenState extends State<ShopRegisterScreen> {
                                   SnackBar(
                                     content: Text(isEditing
                                         ? 'Shop profile updated successfully'
-                                        : 'Shop registered successfully'),
+                                        : 'Shop registered successfully for one year'),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
