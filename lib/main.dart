@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:am_user/controller/ad_controller/ad_controller.dart';
 import 'package:am_user/controller/controllers.dart';
@@ -34,17 +33,6 @@ void main() async {
   final controller = Get.find<GetUserController>();
   controller.getUser();
 
-  // rgb(37, 150, 190)
-  //#449a26
-
-  //#0171b9
-  //rgba(1,113,185,255)
-
-
-  // if(kIsWeb) {
-  //   final controller = Get.find<Controller>();
-  //   controller.onInit();
-  // }
   runApp(MyApp());
 }
 
@@ -67,9 +55,6 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
       ),
       routerConfig: router,
-      // routerDelegate: router.routerDelegate,
-      // routeInformationParser: router.routeInformationParser,
-      // routeInformationProvider: router.routeInformationProvider,
     );
   }
 }

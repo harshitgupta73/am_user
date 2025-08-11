@@ -102,51 +102,6 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
-          // Expanded(
-          //   child: Obx(() => controller.allUsers.isEmpty ? CircularProgressIndicator() : GridView.builder(
-          //     // physics: const NeverScrollableScrollPhysics(),
-          //     itemCount:searchController.allResults.isNotEmpty
-          //         ? searchController.allResults.length
-          //         : controller.allUsers.length,
-          //     shrinkWrap: true,
-          //     padding: Responsive.isMobile(context)
-          //         ? EdgeInsets.zero
-          //         : EdgeInsets.all(20),
-          //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //       crossAxisCount: Responsive.isMobile(context) ? 1 : 2,
-          //       crossAxisSpacing: Responsive.isMobile(context) ? 0 : 10,
-          //       mainAxisSpacing: Responsive.isMobile(context) ? 0 : 10,-re
-          //       childAspectRatio: Responsive.isDesktop(context)
-          //           ? 20 / 5
-          //           : Responsive.isMobile(context)
-          //           ? 14 / 5
-          //           : 15 / 5,
-          //     ),
-          //     itemBuilder: (context, index) {
-          //       final users = searchController.allResults.isNotEmpty
-          //           ? searchController.allResults[index]
-          //           : controller.allUsers[index];
-          //
-          //       return InkWell(
-          //         onTap: () {
-          //           if (kIsWeb) {
-          //             // Web routing if needed
-          //           } else {
-          //
-          //           }
-          //         },
-          //         child:  ListDetailsCardForWeb(
-          //           id: users.id,
-          //           name: users.name,
-          //           contact: users.contact,
-          //           work: users.type,
-          //           image: users.image,
-          //           distance: users.distance,
-          //         ),
-          //       );
-          //     },
-          //   )),
-          // ),
           Expanded(
             child: Obx(() {
               if (searchController.isLoading.value) {
@@ -159,7 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       : controller.allUsers;
 
               if (results.isEmpty) {
-                return const Center(child: Text("No results found"));
+                return const Center(child: CircularProgressIndicator(color: Colors.black,));
               }
 
               return GridView.builder(

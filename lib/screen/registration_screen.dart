@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-
 import '../controller/user_provider/get_user_provider.dart';
 import '../widgets/common_methods.dart';
 import '../widgets/routs/routs.dart';
@@ -23,8 +22,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.black, // status bar background
-        statusBarIconBrightness: Brightness.dark, // icons: time, battery
+        statusBarColor: Colors.black, 
+        statusBarIconBrightness: Brightness.dark, 
       ),
     );
     String type = "";
@@ -56,7 +55,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
               child: Row(
                 children: [
-                  Icon(Icons.home_work,color: Colors.cyan,size: 40,),
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: AssetImage(
+                          "assets/images/104a911c63dcaf4814ee6136c5825d5b.jpg",
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                   SizedBox(width: 20,),
                   Text(
                     "Business & Shop",
@@ -76,7 +87,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
               child: Row(
                 children: [
-                  Icon(Icons.manage_accounts,color: Colors.deepPurpleAccent,size: 40,),
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: AssetImage(
+                          "assets/images/d50eb623382d5c7483cca89cc13582f7.jpg",
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                   SizedBox(width: 20,),
                   Text(
                     "Workers",
@@ -96,7 +119,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
               child: Row(
                 children: [
-                  Icon(Icons.directions_car_filled,color: Colors.redAccent,size: 40,),
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: AssetImage(
+                          "assets/images/ffeab1a8e03347dba1cf79d32d055309.jpg",
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                   SizedBox(width: 20,),
                   Text(
                     "Vehicles",

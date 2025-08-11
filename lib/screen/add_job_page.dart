@@ -74,7 +74,7 @@ class _AddJobPageState extends State<AddJobPage> {
       backgroundColor: backgroundColor,
       appBar: AppBar(title: Text("Add Information"), centerTitle: true),
       body: DefaultTabController(
-        length: 3,
+        length:2 ,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -86,7 +86,7 @@ class _AddJobPageState extends State<AddJobPage> {
               indicatorWeight: 3,
               indicatorSize: TabBarIndicatorSize.label,
               dividerColor: Colors.black,
-              tabs: [Tab(text: "Text"), Tab(text: "Image"), Tab(text: "Video")],
+              tabs: [Tab(text: "Text"), Tab(text: "Image")],
             ),
             SizedBox(height: 20),
             // Tab Views
@@ -181,65 +181,65 @@ class _AddJobPageState extends State<AddJobPage> {
                   ),
 
                   // VIDEO Tab
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final file = await ImagePicker().pickVideo(
-                                      source: ImageSource.camera,
-                                    );
-                                    if (file != null) {
-                                      setState(() {
-                                        selectedType = "video";
-                                        pickedFile = file.path;
-                                      });
-                                    }
-                                    videoThumbnail = await getVideoThumbnail(file!.path);
-                                  },
-                                  child: Text("Open Camera"),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final file = await ImagePicker().pickVideo(
-                                      source: ImageSource.gallery,
-                                    );
-                                    if (file != null) {
-                                      setState(() {
-                                        selectedType = "video";
-                                        pickedFile = file.path;
-                                      });
-                                    }
-                                    videoThumbnail = await getVideoThumbnail(file!.path);
-                                  },
-                                  child: Text("Pick Video"),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      if (pickedFile != null)
-                        Image.file(
-                          File(videoThumbnail!.path),
-                          height: 250,
-                          width: double.infinity,
-                        ),
-                    ],
-                  ),
+                  // Column(
+                  //   children: [
+                  //     Row(
+                  //       children: [
+                  //         Expanded(
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             children: [
+                  //               ElevatedButton(
+                  //                 onPressed: () async {
+                  //                   final file = await ImagePicker().pickVideo(
+                  //                     source: ImageSource.camera,
+                  //                   );
+                  //                   if (file != null) {
+                  //                     setState(() {
+                  //                       selectedType = "video";
+                  //                       pickedFile = file.path;
+                  //                     });
+                  //                   }
+                  //                   videoThumbnail = await getVideoThumbnail(file!.path);
+                  //                 },
+                  //                 child: Text("Open Camera"),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //         Expanded(
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             children: [
+                  //               ElevatedButton(
+                  //                 onPressed: () async {
+                  //                   final file = await ImagePicker().pickVideo(
+                  //                     source: ImageSource.gallery,
+                  //                   );
+                  //                   if (file != null) {
+                  //                     setState(() {
+                  //                       selectedType = "video";
+                  //                       pickedFile = file.path;
+                  //                     });
+                  //                   }
+                  //                   videoThumbnail = await getVideoThumbnail(file!.path);
+                  //                 },
+                  //                 child: Text("Pick Video"),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     SizedBox(height: 20),
+                  //     if (pickedFile != null)
+                  //       Image.file(
+                  //         File(videoThumbnail!.path),
+                  //         height: 250,
+                  //         width: double.infinity,
+                  //       ),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
