@@ -37,7 +37,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   void loadChats() async{
     await chatController.loadUserChats(userController.myUser!.userId!);
-    // print("ChatRooms = ${chatController.chatRooms.length}");
+
   }
 
 
@@ -54,21 +54,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return DateFormat('dd/MM/yyyy hh:mm a').format(dateTime);
   }
 
-  // Filter chats based on the search query
-  // void _filterChats() {
-  //   final query = _searchController.text.toLowerCase();
-  //
-  //   setState(() {
-  //     if (query.isEmpty) {
-  //       filteredChats = chatRooms; // Show all chats when the query is empty
-  //     } else {
-  //       filteredChats = chatRooms.where((chat) {
-  //         return chat.roomId.toLowerCase().contains(query) ||
-  //             chat.lastMessage.toLowerCase().contains(query);
-  //       }).toList();
-  //     }
-  //   });
-  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -140,25 +126,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             backgroundImage: NetworkImage(otherUser.image!),
                             radius: 25,
                           ),
-                          // if (chat.isOnline)
-                          //   Positioned(
-                          //     right: 0,
-                          //     bottom: 0,
-                          //     child: Container(
-                          //       width: 14,
-                          //       height: 14,
-                          //       decoration: BoxDecoration(
-                          //         color: Colors.green,
-                          //         shape: BoxShape.circle,
-                          //         border: Border.all(
-                          //           color: isDarkMode
-                          //               ? Colors.grey[900]!
-                          //               : Colors.grey[100]!,
-                          //           width: 2,
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
+
                         ],
                       ),
                       title: Text(
@@ -191,27 +159,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          // if (!chat.isRead)
-                          //   Container(
-                          //     padding: const EdgeInsets.all(4),
-                          //     decoration: const BoxDecoration(
-                          //       color: Colors.blue,
-                          //       shape: BoxShape.circle,
-                          //     ),
-                          //     child: const Text(
-                          //       '1',
-                          //       style: TextStyle(
-                          //         color: Colors.white,
-                          //         fontSize: 10,
-                          //       ),
-                          //     ),
-                          //   ),
+
                         ],
                       ),
                       onTap: () {
                         // Mark as read when tapped
-                        context.push('${RoutsName.chatScreen}?currentUserId=${userController
-                            .myUser!.userId!}&targetUserId=${otherUserId}&targetUserName=${Uri.encodeComponent(otherUser!.name)}');
+                        context.push('${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=$otherUserId&targetUserName=${Uri.encodeComponent(otherUser!.name)}');
                       },
                     ),
                   );

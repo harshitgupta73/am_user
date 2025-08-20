@@ -180,66 +180,6 @@ class _AddJobPageState extends State<AddJobPage> {
                     ],
                   ),
 
-                  // VIDEO Tab
-                  // Column(
-                  //   children: [
-                  //     Row(
-                  //       children: [
-                  //         Expanded(
-                  //           child: Column(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             children: [
-                  //               ElevatedButton(
-                  //                 onPressed: () async {
-                  //                   final file = await ImagePicker().pickVideo(
-                  //                     source: ImageSource.camera,
-                  //                   );
-                  //                   if (file != null) {
-                  //                     setState(() {
-                  //                       selectedType = "video";
-                  //                       pickedFile = file.path;
-                  //                     });
-                  //                   }
-                  //                   videoThumbnail = await getVideoThumbnail(file!.path);
-                  //                 },
-                  //                 child: Text("Open Camera"),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         Expanded(
-                  //           child: Column(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             children: [
-                  //               ElevatedButton(
-                  //                 onPressed: () async {
-                  //                   final file = await ImagePicker().pickVideo(
-                  //                     source: ImageSource.gallery,
-                  //                   );
-                  //                   if (file != null) {
-                  //                     setState(() {
-                  //                       selectedType = "video";
-                  //                       pickedFile = file.path;
-                  //                     });
-                  //                   }
-                  //                   videoThumbnail = await getVideoThumbnail(file!.path);
-                  //                 },
-                  //                 child: Text("Pick Video"),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //     SizedBox(height: 20),
-                  //     if (pickedFile != null)
-                  //       Image.file(
-                  //         File(videoThumbnail!.path),
-                  //         height: 250,
-                  //         width: double.infinity,
-                  //       ),
-                  //   ],
-                  // ),
                 ],
               ),
             ),

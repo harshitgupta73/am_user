@@ -1,9 +1,11 @@
+import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/constants/login_type.dart';
 import 'package:am_user/widgets/routs/routs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -21,13 +23,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
 
     // Navigate after delay with default currentIndex = 0
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 5), () {
     User?  user = auth.currentUser;
     if(user !=null){
-      context.push("${RoutsName.bottomNavigation}/0");
+      context.pushReplacement("${RoutsName.bottomNavigation}/0");
 
     }else{
-      context.push(RoutsName.registrationScreen);
+      context.pushReplacement(RoutsName.registrationScreen);
 
     }
     });
@@ -42,22 +44,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Animated Logo
-            Image.asset(
-             logo,
-              width: 120,
-              height: 120,
-            )
-                .animate()
-                .scale(duration: 900.ms, curve: Curves.easeOutBack)
-                .fadeIn(duration: 1200.ms),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 10),
+            Lottie.asset("assets/animation/amuserLottie.json"),
+
             // App Name
             const Text(
-              "My Premium App",
+              tagLine,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
               ),

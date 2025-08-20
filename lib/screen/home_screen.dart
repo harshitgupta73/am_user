@@ -132,14 +132,7 @@ getuserOnTheLoad()async{
   void initState() {
     super.initState();
     getuserOnTheLoad();
-
-
-    if (!Platform.isAndroid) {
-      print("object");
-    }
     adController.fetchAds();
-    // _searchController.addListener(_onChange);
-
   }
 
   final controller = Get.put(Controller());

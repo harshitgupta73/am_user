@@ -171,7 +171,6 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final d = widget.users;
-    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(title: Text('${d!.type} Details')),
@@ -268,9 +267,10 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      context.push(
-                        '${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=${d.id}&targetUserName=${Uri.encodeComponent(d.name)}',
+                      if(userController.myUser !=null &&userController.myUser!.userId !=null) {
+                        context.push('${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=${d.id}&targetUserName=${Uri.encodeComponent(d.name)}',
                       );
+                      }
                     },
                     icon: const Icon(Icons.message),
                     label: const Text("Message"),

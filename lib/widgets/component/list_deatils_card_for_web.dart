@@ -185,8 +185,8 @@ class _ListDetailsCardForWebState extends State<ListDetailsCardForWeb> {
 
                     child: Center(
                       child: IconButton(
-                        onPressed: () {
-                          Utils().dialNumber(widget.contact!, context);
+                        onPressed: () async {
+                         await Utils().dialNumber(widget.contact!, context);
                         },
                         icon: Icon(
                           Icons.phone,
@@ -206,9 +206,12 @@ class _ListDetailsCardForWebState extends State<ListDetailsCardForWeb> {
                     child: Center(
                       child: GestureDetector(
                         onTap: (){
-                          context.push(
-                            '${RoutsName.chatScreen}?currentUserId=${FirebaseAuth.instance.currentUser!.uid}&targetUserId=${widget.id}&targetUserName=${Uri.encodeComponent(widget.name!)}',
+                          var user = FirebaseAuth.instance.currentUser;
+                          if(user !=null && widget.name !=null) {
+                            context.push(
+                            '${RoutsName.chatScreen}?currentUserId=${user.uid}&targetUserId=${widget.id}&targetUserName=${Uri.encodeComponent(widget.name!)}',
                           );
+                          }
                         },
                         child: Icon(
                           Icons.message,

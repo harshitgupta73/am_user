@@ -6,6 +6,7 @@ import 'package:am_user/data/firebase/user/user_insert_update.dart';
 import 'package:am_user/modals/userModal.dart';
 import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/component/custom_buttom.dart';
+import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/constants/login_type.dart';
 import 'package:am_user/widgets/utils/loading_indicator.dart';
 import 'package:am_user/widgets/utils/utils.dart';
@@ -74,7 +75,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
      if(result == null){
        await _sharePreferencesMethods.saveUserToSharedPref(userModal);
-       context.push("${RoutsName.bottomNavigation}/0");
+       context.pushReplacement("${RoutsName.bottomNavigation}/0");
      Utils.showAppSnackBar(context, "Account Created Successfully",backgroundColor: Colors.green);
      }else{
       Utils.showAppSnackBar(context, result,backgroundColor: Colors.red);
@@ -108,13 +109,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    child: Image.asset(
-                      logo,
-                      height: 150,
+                  Container(
+                    height: 150,
+                    clipBehavior: Clip.antiAlias,
+                    padding: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      image: DecorationImage(image: AssetImage(logo))
+
                     ),
+
                   ),
+                  Text(tagLine),
+                  SizedBox(height: 10,),
                   TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.text,

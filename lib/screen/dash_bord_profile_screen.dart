@@ -31,27 +31,7 @@ class _DashBordScreenState extends State<DashBordScreen> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600; // simple check
 
-    // if (userController.myUser == null ||
-    //     userController.myUser!.images == null ||
-    //     userController.myUser!.videos == null) {
-    //   return Scaffold(
-    //     backgroundColor: backgroundColor,
-    //     body: const Center(
-    //       child: CircularProgressIndicator(color: Colors.redAccent),
-    //     ),
-    //   );
-    // }
 
-    // if(userController.shopModal.value != null){
-    //   return Text("Shop exist");
-    // }else if(userController.driverModal.value != null){
-    //   return Text("Driver exist");
-    // }else if(userController.workerModal.value != null){
-    //   return Text("Worker exist");
-    // }
-    // return Container(
-    //   child: Text("user type"),
-    // );
 
     return Scaffold(
       backgroundColor: backgroundColor,

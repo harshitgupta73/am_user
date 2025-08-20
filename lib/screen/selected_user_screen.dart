@@ -193,18 +193,11 @@ class _SelectedUserScreenState extends State<SelectedUserScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // final currentUserId = controller.currentUser.id; // Replace appropriately
-                      // final targetUserId = widget.users.id;
-                      // final targetUserName = widget.users.name ?? '';
-                      //
-                      // Get.to(() => ChatPage(
-                      //   currentUserId: currentUserId,
-                      //   targetUserId: targetUserId,
-                      //   targetUserName: targetUserName,
-                      // ));
-                      context.go(
+                      if(userController.myUser !=null && shop.shopName !=null) {
+                        context.go(
                         '${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=${shop.shopId}&targetUserName=${Uri.encodeComponent(shop.shopName!)}',
                       );
+                      }
                     },
                     icon: const Icon(Icons.message),
                     label: const Text("Message"),

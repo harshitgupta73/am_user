@@ -1,3 +1,7 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:go_router/go_router.dart';
 import 'package:am_user/modals/userModal.dart';
 import 'package:am_user/modals/worker_modal.dart';
 import 'package:am_user/screen/chatList_screen.dart';
@@ -5,12 +9,7 @@ import 'package:am_user/screen/home_screen.dart';
 import 'package:am_user/screen/jobe_search.dart';
 import 'package:am_user/screen/serach_screen.dart';
 import 'package:am_user/widgets/constants/const.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:go_router/go_router.dart';
-import '../../screen/dash_bord_profile_screen.dart';
-import '../../screen/registration_screen.dart';
+import 'package:am_user/screen/registration_screen.dart';
 import '../routs/routs.dart';
 
 class CurvedNavBar extends StatefulWidget {
@@ -24,62 +23,57 @@ class CurvedNavBar extends StatefulWidget {
 
 class _CurvedNavBarState extends State<CurvedNavBar> {
   late int _selectedIndex;
-
   late List<Widget> pages;
-
-
-
-   List<WorkerModal> workers = [];
+  List<WorkerModal> workers = [];
 
   final UserModal userModal = UserModal(
-
-   email:  "surah@gmail.com",
-  contact:   "9956463608",
-   name:  "Suraj Gupta",
-   image:  "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-  userId:   null
+    email: "surah@gmail.com",
+    contact: "9956463608",
+    name: "Suraj Gupta",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    userId: null,
   );
 
   final items = <Widget>[
-    tabIcon(Icons.home),
-    tabIcon(Icons.search),
-    tabIcon(Icons.chat),
-    tabIcon(Icons.info_outline),
-    tabIcon(Icons.edit),
+    _TabIcon(Icons.home),
+    _TabIcon(Icons.search),
+    _TabIcon(Icons.chat),
+    _TabIcon(Icons.info_outline),
+    _TabIcon(Icons.edit),
   ];
-
-  static Widget tabIcon(IconData icon) {
-    return Icon(icon, color: Colors.white);
-  }
 
   @override
   void initState() {
     super.initState();
-    // workers = List.generate(10, (index) => dummyWorker,);
     _selectedIndex = widget.currentIndex;
     pages = [
-      HomeScreen(),
-      SearchScreen(),
-      ChatListScreen(),
-      JobSearchScreen(),
-      RegistrationScreen(),
-
+      const HomeScreen(),
+            SearchScreen(),
+      const ChatListScreen(),
+            JobSearchScreen(),
+      const RegistrationScreen(),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final isWeb = kIsWeb;
+    if (kIsWeb) {
+      return _buildWebLayout();
+    } else {
+      return _buildMobileLayout();
+    }
+  }
 
-    return isWeb
-        ? Scaffold(
+  Widget _buildWebLayout() {
+    return Scaffold(
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.black,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
             items.length,
                 (index) => IconButton(
+                  style: ButtonStyle(),
               icon: items[index],
               onPressed: () {
                 setState(() {
@@ -92,8 +86,11 @@ class _CurvedNavBarState extends State<CurvedNavBar> {
         ),
       ),
       body: pages[_selectedIndex],
-    )
-        : Scaffold(
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: backgroundColor,
         color: forgroundColor,
@@ -107,5 +104,16 @@ class _CurvedNavBarState extends State<CurvedNavBar> {
       ),
       body: pages[_selectedIndex],
     );
+  }
+}
+
+class _TabIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _TabIcon(this.icon);
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(icon, color: Colors.white);
   }
 }

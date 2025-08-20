@@ -46,76 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = false;
   bool _isLogin = false;
 
-  // void _loginWithEmailAndPassword() async {
-  //   // Show the loader inside a dialog
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder:
-  //         (context) => const ShowLoadingIndicator(message: "Please wait..."),
-  //   );
-  //
-  //   // Call Firebase Auth
-  //   final result = await auth.loginWithEmailAndPassword(
-  //     email: _emailController.text.trim(),
-  //     password: _passwordController.text.trim(),
-  //   );
-  //
-  //   // Close the loader
-  //   Navigator.of(context, rootNavigator: true).pop();
-  //
-  //   // Show the result
-  //   if (result == null) {
-  //     // Get current logged in user ID
-  //     String uid = FirebaseAuth.instance.currentUser!.uid;
-  //
-  //     final firestore = FirebaseFirestore.instance;
-  //
-  //     // Check for user type
-  //     final shopDoc = await firestore.collection("Shops").doc(uid).get();
-  //     final driverDoc = await firestore.collection("drivers").doc(uid).get();
-  //     final workerDoc = await firestore.collection("Workers").doc(uid).get();
-  //
-  //     // Redirect based on document existence
-  //
-  //     if (shopDoc.exists) {
-  //       print("Shopdoc = ${shopDoc.data()}");
-  //       final data = shopDoc.data();
-  //       if (data != null) {
-  //         final shopModal = ShopModal.fromJson(data);
-  //         await sharePreferencesMethods.saveShopToSharedPref(shopModal);
-  //         print("Shop document exists");
-  //         context.pushReplacement("${RoutsName.bottomNavigation}/0");
-  //       } // you need to define this
-  //     } else if (driverDoc.exists) {
-  //       final data = driverDoc.data();
-  //       if (data != null) {
-  //         final driverModal = DriverModal.fromJson(data);
-  //         await sharePreferencesMethods.saveVehicleToSharedPref(driverModal);
-  //       }
-  //       print("Driver document exists");
-  //       context.pushReplacement("${RoutsName.bottomNavigation}/0");
-  //     } else if (workerDoc.exists) {
-  //       final data = workerDoc.data();
-  //       if (data != null) {
-  //         final workerModal = WorkerModal.fromJson(data);
-  //         await sharePreferencesMethods.saveWorkerToSharedPref(workerModal);
-  //       }
-  //       print("Worker document exists");
-  //       context.pushReplacement("${RoutsName.bottomNavigation}/0");
-  //     } else {
-  //       print("No document exists");
-  //       context.pushReplacement("${RoutsName.bottomNavigation}/0");
-  //     }
-  //     Utils.showAppSnackBar(
-  //       context,
-  //       "Login Successful",
-  //       backgroundColor: Colors.green,
-  //     );
-  //   } else {
-  //     Utils.showAppSnackBar(context, result, backgroundColor: Colors.red);
-  //   }
-  // }
 
   void _loginWithEmailAndPassword() async {
     // Show loading
@@ -223,17 +153,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 20),
 
-                  ClipRRect(
-                    child: Image.asset(logo, height: 150, fit: BoxFit.cover),
-                  ),
+                  Container(
+                    height: 150,
+                    clipBehavior: Clip.antiAlias,
+                    padding: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        image: DecorationImage(image: AssetImage(logo))
 
-                  Text(
-                    "Ready to Connect",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w300,
                     ),
+
                   ),
+                  Text(tagLine),
 
                   SizedBox(height: 20),
                   CustomTextField(

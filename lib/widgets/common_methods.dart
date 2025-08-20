@@ -13,13 +13,13 @@ void customNavigate(BuildContext context, String page, dynamic data) {
   }else{
     path = page;
   }
-
   if (kIsWeb) {
     context.go(path); // Web-friendly navigation
   } else {
     context.push(path); // Push onto the stack in mobile/native
   }
 }
+
 
 String encodeDriverToUrl(DriverModal driver) {
   final jsonString = jsonEncode(driver.toJson());
