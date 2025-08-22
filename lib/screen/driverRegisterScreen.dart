@@ -404,9 +404,9 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                                   );
                                   if (!isEditing) {
                                     imagePickerController.imagePath.value = '';
-                                    Navigator.pop(context);
+                                    context.pop();
                                   } else {
-                                    customNavigate(context, RoutsName.typeDashboard, null);
+                                    customNavigate(context, RoutsName.typeDashboard);
                                   }
                                 } catch (e) {
                                   Get.snackbar(
@@ -429,20 +429,20 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                           );
                     }),
                     SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            context.go("${RoutsName.loginScreen}/$driverLogin");
-                          },
-                          child: Text(
-                            "Already have Account? Login",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.end,
+                    //   children: [
+                    //     InkWell(
+                    //       onTap: () {
+                    //         context.go("${RoutsName.loginScreen}/$driverLogin");
+                    //       },
+                    //       child: Text(
+                    //         "Already have Account? Login",
+                    //         style: TextStyle(color: Colors.white),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),

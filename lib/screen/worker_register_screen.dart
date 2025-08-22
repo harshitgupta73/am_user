@@ -403,7 +403,7 @@ class _WorkerRegisterState extends State<WorkerRegister> {
                                     imagePickerController.imagePath.value = '';
                                     Navigator.pop(context);
                                   } else {
-                                    customNavigate(context, RoutsName.typeDashboard, null);
+                                    customNavigate(context, RoutsName.typeDashboard);
                                   }
                                 } catch (e) {
                                   controller.stopLoading();

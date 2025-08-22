@@ -83,7 +83,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             SizedBox(height: 10),
             GestureDetector(
               onTap: () {
-                customNavigate(context, RoutsName.workRegisterScreen, null);
+                customNavigate(context, RoutsName.workRegisterScreen);
               },
               child: Row(
                 children: [

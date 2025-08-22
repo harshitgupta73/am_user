@@ -1,5 +1,6 @@
 import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/responsive/reponsive_layout.dart';
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/utils/utils.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -206,11 +207,15 @@ class _ListDetailsCardForWebState extends State<ListDetailsCardForWeb> {
                     child: Center(
                       child: GestureDetector(
                         onTap: (){
-                          var user = FirebaseAuth.instance.currentUser;
-                          if(user !=null && widget.name !=null) {
-                            context.push(
-                            '${RoutsName.chatScreen}?currentUserId=${user.uid}&targetUserId=${widget.id}&targetUserName=${Uri.encodeComponent(widget.name!)}',
-                          );
+                          if(widget.name !=null) {
+                            customNavigate(
+                              context,
+                              RoutsName.chatScreen,
+                              queryParams: {
+                                "targetUserId": widget.id!,
+                                "targetUserName": Uri.encodeComponent(widget.name!),
+                              },
+                            );
                           }
                         },
                         child: Icon(

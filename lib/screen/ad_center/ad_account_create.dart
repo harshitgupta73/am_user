@@ -4,6 +4,7 @@ import 'package:am_user/controller/ad_controller/ad_controller.dart';
 import 'package:am_user/data/firebase/ad_services/ad_services.dart';
 import 'package:am_user/data/firebase/storage_services/storage_service.dart';
 import 'package:am_user/modals/add_modal.dart';
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/component/custom_buttom.dart';
 import 'package:am_user/widgets/component/custom_dropdwon.dart';
 import 'package:am_user/widgets/component/custome_textfield.dart';
@@ -497,7 +498,8 @@ class _AdRegisterScreenState extends State<AdRegisterScreen> {
     await adController.fetchAds();
 
     // ✅ Optionally show success/snackbar
-    context.go("${RoutsName.bottomNavigation}/0");
+    // context.go("${RoutsName.bottomNavigation}/0");
+    customNavigate(context, "${RoutsName.bottomNavigation}/0");
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("Ad registered successfully")));

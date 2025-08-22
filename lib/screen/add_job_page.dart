@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -216,7 +217,7 @@ class _AddJobPageState extends State<AddJobPage> {
           }
 
           await jobController.loadJobs();
-          context.pop();
+          customNavigate(context, null,pop: true);
           name.clear();
           pickedFile = null;
           pickedImage = null;

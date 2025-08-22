@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -69,7 +70,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     );
 
     await controller.getUser();
-    context.pop();
+    customNavigate(context, null, pop: true);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../data/shareprefrance/shareprefrance.dart';
 import '../modals/userModal.dart';
+import '../widgets/common_methods.dart';
 import '../widgets/routs/routs.dart';
 import 'full_screen_video_play.dart';
 
@@ -51,7 +52,7 @@ class _DashBordScreenState extends State<DashBordScreen> {
                 actions: [
                   IconButton(
                     onPressed: () {
-                      context.go(RoutsName.addPostScreen);
+                      customNavigate(context, RoutsName.addPostScreen);
                     },
                     icon: Icon(Icons.add, color: Colors.white),
                   ),
@@ -236,17 +237,12 @@ class _DashBordScreenState extends State<DashBordScreen> {
                     return isVideo
                         ? InkWell(
                           onTap:
-                              () => Navigator.push(
+                              () => customNavigate(
                                 context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => ReelsStyleVideoPlayer(
-                                        videoUrl:
-                                            userController
-                                                .myUser!
-                                                .videos![index],
-                                      ),
-                                ),
+                                RoutsName.reelsVideoPlayer,
+                                queryParams: {
+                                  'videoUrl': userController.myUser!.videos![index],
+                                },
                               ),
                           child: ReelContainer(
                             videoUrl: userController.myUser!.videos![index],
@@ -305,7 +301,7 @@ class _DashBordScreenState extends State<DashBordScreen> {
                   setState(() {
                     selectedLanguage = 'English';
                   });
-                  Navigator.pop(context);
+                  context.pop();
                 },
               ),
               ListTile(
@@ -314,7 +310,7 @@ class _DashBordScreenState extends State<DashBordScreen> {
                   setState(() {
                     selectedLanguage = 'Hindi';
                   });
-                  Navigator.pop(context);
+                  context.pop();
                 },
               ),
               ListTile(
@@ -323,7 +319,7 @@ class _DashBordScreenState extends State<DashBordScreen> {
                   setState(() {
                     selectedLanguage = 'Spanish';
                   });
-                  Navigator.pop(context);
+                  context.pop();
                 },
               ),
             ],

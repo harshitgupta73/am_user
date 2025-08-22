@@ -178,8 +178,8 @@ getuserOnTheLoad()async{
                       onTap: () {
                         // navigateToProfileScreen(userModal);
                         screen == "user_dashboard"
-                            ? customNavigate(context,RoutsName.profileScreen,null)
-                            : customNavigate(context,RoutsName.typeDashboard,null);
+                            ? customNavigate(context,RoutsName.profileScreen)
+                            : customNavigate(context,RoutsName.typeDashboard);
                       },
                       child: CircleAvatar(
                         radius: 25,

@@ -2,6 +2,7 @@ import 'package:am_user/controller/controllers.dart';
 import 'package:am_user/controller/user_provider/get_user_provider.dart';
 import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/chat_room_model.dart';
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/routs/routs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -164,7 +165,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       ),
                       onTap: () {
                         // Mark as read when tapped
-                        context.push('${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=$otherUserId&targetUserName=${Uri.encodeComponent(otherUser!.name)}');
+                        customNavigate(
+                          context,
+                          RoutsName.chatScreen,
+                          queryParams: {
+                            'targetUserId': otherUserId,
+                            'targetUserName': otherUser!.name,
+                          },
+                        );
                       },
                     ),
                   );

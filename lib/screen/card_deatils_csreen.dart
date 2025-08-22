@@ -2,17 +2,15 @@ import 'package:am_user/controller/controllers.dart';
 import 'package:am_user/modals/all_user_modal.dart';
 import 'package:am_user/modals/shopModal.dart';
 import 'package:am_user/modals/worker_modal.dart';
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/routs/routs.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 import '../controller/user_provider/get_user_provider.dart';
 import '../modals/driver_modal.dart';
-import '../responsive/reponsive_layout.dart';
 import '../widgets/utils/utils.dart';
 
 class CardDetailsScreen extends StatefulWidget {
@@ -139,6 +137,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
       ),
     );
   }
+
   Widget _buildField(String label, dynamic value) {
     if (value == null || value.toString().trim().isEmpty) return SizedBox();
     return Padding(
@@ -154,15 +153,29 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         const SizedBox(height: 6),
         if (url != null && url.isNotEmpty)
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(url, height: 120, width: double.infinity, fit: BoxFit.cover),
+            child: Image.network(
+              url,
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           )
         else
-          const Text("No Image Available", style: TextStyle(color: Colors.white)),
+          const Text(
+            "No Image Available",
+            style: TextStyle(color: Colors.white),
+          ),
         const SizedBox(height: 12),
       ],
     );
@@ -185,17 +198,31 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: d.image != null && d.image!.isNotEmpty
-                      ? NetworkImage(d.image!)
-                      : const AssetImage("assets/images/default_profile.png") as ImageProvider,
+                  backgroundImage:
+                      d.image != null && d.image!.isNotEmpty
+                          ? NetworkImage(d.image!)
+                          : const AssetImage(
+                                "assets/images/default_profile.png",
+                              )
+                              as ImageProvider,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(d.name ?? '-', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                      Text("Contact: ${d.contact ?? '-'}", style: const TextStyle(color: Colors.white)),
+                      Text(
+                        d.name ?? '-',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        "Contact: ${d.contact ?? '-'}",
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                 ),
@@ -205,20 +232,34 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
 
             if (d.type == "Shop" && shop != null) ...[
               _buildField("Proprietor", shop!.proprietorName),
-              _buildField("Address", "${shop!.shopAddress}, ${shop!.distValue}, ${shop!.stateValue}"),
+              _buildField(
+                "Address",
+                "${shop!.shopAddress}, ${shop!.distValue}, ${shop!.stateValue}",
+              ),
               _buildField("About Business", shop!.aboutBusiness),
               _buildField("Website", shop!.website),
               _buildField("Shop Item", shop!.shopItem),
               _buildField("Shop Type", shop!.shopType?.join(', ')),
               _buildField("Categories", shop!.shopCategorySet?.join(', ')),
-              _buildField("Subcategories", shop!.shopSubcategoryMap?.entries.map((e) => "${e.key}: ${e.value.join(', ')}").join("\n")),
-              _buildField("Working Hours", "${shop!.openingTime} - ${shop!.closingTime}"),
+              _buildField(
+                "Subcategories",
+                shop!.shopSubcategoryMap?.entries
+                    .map((e) => "${e.key}: ${e.value.join(', ')}")
+                    .join("\n"),
+              ),
+              _buildField(
+                "Working Hours",
+                "${shop!.openingTime} - ${shop!.closingTime}",
+              ),
               _buildField("Working Days", shop!.days?.join(', ')),
             ],
 
             if (d.type == "Worker" && worker != null) ...[
               _buildField("Gender", worker!.selectedGender),
-              _buildField("Address", "${worker!.address}, ${worker!.distValue}, ${worker!.stateValue}"),
+              _buildField(
+                "Address",
+                "${worker!.address}, ${worker!.distValue}, ${worker!.stateValue}",
+              ),
               _buildField("Skills", worker!.otherSkills),
               _buildField("Work Types", worker!.workType?.join(', ')),
             ],
@@ -229,7 +270,10 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
               _buildField("Vehicle No", driver!.vehicleNo),
               _buildField("Vehicle Name", driver!.vehicleName),
               _buildField("Vehicle Owner", driver!.vehicleOwnerName),
-              _buildField("Address", "${driver!.driverAddress}, ${driver!.distValue}, ${driver!.stateValue}"),
+              _buildField(
+                "Address",
+                "${driver!.driverAddress}, ${driver!.distValue}, ${driver!.stateValue}",
+              ),
               _buildField("Other Skill", driver!.driverOtherSkill),
               const SizedBox(height: 16),
               _buildImage(driver!.vehicleRcImage, "Vehicle RC Image"),
@@ -267,9 +311,15 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      if(userController.myUser !=null &&userController.myUser!.userId !=null) {
-                        context.push('${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=${d.id}&targetUserName=${Uri.encodeComponent(d.name)}',
-                      );
+                      if (userController.myUser != null &&
+                          userController.myUser!.userId != null) {
+                        // context.push(
+                        //   '${RoutsName.chatScreen}?currentUserId=${userController.myUser!.userId!}&targetUserId=${d.id}&targetUserName=${Uri.encodeComponent(d.name)}',
+                        // );
+                        customNavigate(context, RoutsName.chatScreen,queryParams: {
+                          'targetUserId': d.id,
+                          'targetUserName': Uri.encodeComponent(d.name),
+                        });
                       }
                     },
                     icon: const Icon(Icons.message),
@@ -348,54 +398,65 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
             ),
 
             const SizedBox(height: 20),
-            Obx(()
-              =>userController.otherUser.value == null ? Center(child: CircularProgressIndicator(),): isVideo
-                  ? (userController.otherUser.value!.videos != null &&
-                          userController.otherUser.value!.videos!.isNotEmpty)
-                      ? Column(
-                        children: List.generate(
-                          userController.otherUser.value!.videos!.length,
-                          (index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: _buildVideoCard(index),
-                            );
-                          },
-                        ),
+            Obx(
+              () =>
+                  userController.otherUser.value == null
+                      ? Center(child: CircularProgressIndicator())
+                      : isVideo
+                      ? (userController.otherUser.value!.videos != null &&
+                              userController
+                                  .otherUser
+                                  .value!
+                                  .videos!
+                                  .isNotEmpty)
+                          ? Column(
+                            children: List.generate(
+                              userController.otherUser.value!.videos!.length,
+                              (index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: _buildVideoCard(index),
+                                );
+                              },
+                            ),
+                          )
+                          : const Center(
+                            child: Text(
+                              "No videos available",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          )
+                      : userController.otherUser.value == null
+                      ? Center(child: CircularProgressIndicator())
+                      : (userController.otherUser.value!.images != null &&
+                          userController.otherUser.value!.images!.isNotEmpty)
+                      ? GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount:
+                            userController.otherUser.value!.images!.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 8,
+                            ),
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              userController.otherUser.value!.images![index],
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
                       )
                       : const Center(
                         child: Text(
-                          "No videos available",
+                          "No images available",
                           style: TextStyle(color: Colors.white),
                         ),
-                      )
-                  :userController.otherUser.value == null ? Center(child: CircularProgressIndicator(),): (userController.otherUser.value!.images != null &&
-                      userController.otherUser.value!.images!.isNotEmpty)
-                  ? GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: userController.otherUser.value!.images!.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemBuilder: (context, index) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          userController.otherUser.value!.images![index],
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    },
-                  )
-                  : const Center(
-                    child: Text(
-                      "No images available",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                      ),
             ),
           ],
         ),
@@ -403,4 +464,3 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
     );
   }
 }
-

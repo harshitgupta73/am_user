@@ -1,3 +1,4 @@
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:flutter/material.dart';
 
 class CategorySelectorDialog extends StatefulWidget {
@@ -86,12 +87,12 @@ class _CategorySelectorDialogState extends State<CategorySelectorDialog> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Cancel without save
+              onPressed:() => customNavigate(context, null, pop: true), // Cancel without save
               child: Text("Cancel"),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Save and close
+                customNavigate(context, null, pop: true); // Save and close
                 setState(() {}); // Update chips UI
               },
               child: Text("Done"),

@@ -1,6 +1,7 @@
 import 'package:am_user/controller/controllers.dart';
 import 'package:am_user/controller/image_picker_controller.dart';
 import 'package:am_user/modals/all_user_modal.dart';
+import 'package:am_user/widgets/common_methods.dart';
 import 'package:am_user/widgets/component/reel_conatiner.dart';
 import 'package:am_user/widgets/constants/const.dart';
 import 'package:am_user/widgets/routs/routs.dart';
@@ -10,14 +11,13 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import '../controller/chat_controller/chat_controller.dart';
+import '../controller/user_provider/get_user_provider.dart';
 import '../responsive/reponsive_layout.dart';
 
 class ChatScreen extends StatefulWidget {
-  // final dynamic data; // Use a proper model if possible
-  final String currentUserId;
   final String targetUserId;
   final String targetUserName;
-  const ChatScreen({super.key, required this.currentUserId, required this.targetUserId, required this.targetUserName});
+  const ChatScreen({super.key, required this.targetUserId, required this.targetUserName});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -32,14 +32,18 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   RxBool isLoading = false.obs;
 
+  final GetUserController getController = Get.find<GetUserController>();
+  String? currentUserId;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    currentUserId = getController.myUser?.userId;
     user = controller.allUsers.firstWhereOrNull((e) =>
     e.id ==
         widget.targetUserId);
-    chatController.initChat(widget.currentUserId, widget.targetUserId);
+    chatController.initChat(currentUserId!, widget.targetUserId);
     _scrollController.addListener(_onScroll);
   }
 
@@ -103,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               const SizedBox(width: 10),
               IconButton(onPressed: () {
-                context.push(RoutsName.allChats);
+                customNavigate(context, RoutsName.allChats);
               }, icon: Icon(Icons.arrow_back, color: Colors.black54,))
             ],
           ),
@@ -122,20 +126,23 @@ class _ChatScreenState extends State<ChatScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       itemBuilder: (context, index) {
                         final msg = messages[index];
-                        bool isSender = msg.senderId == widget.currentUserId;
+                        bool isSender = msg.senderId == currentUserId!;
                         Widget messageWidget;
                         if (msg.messageType == 'image' &&
                             msg.mediaUrl != null) {
                           messageWidget = GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FullScreenImageView(
-                                    imageUrl: msg.mediaUrl!,
-                                  ),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => FullScreenImageView(
+                              //       imageUrl: msg.mediaUrl!,
+                              //     ),
+                              //   ),
+                              // );
+                              customNavigate(context, RoutsName.fullImageScreen,queryParams: {
+                                'imageUrl': msg.mediaUrl!,
+                              },);
                             },
                             child: Image.network(
                               msg.mediaUrl!,
@@ -148,13 +155,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             msg.mediaUrl != null) {
                           messageWidget = GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              customNavigate(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => FullScreenVideoPlayer(
-                                    url: msg.mediaUrl!,
-                                  ),
-                                ),
+                                RoutsName.fullVideoScreen,
+                                queryParams: {
+                                  'url': msg.mediaUrl!,
+                                },
                               );
                             },
                             child: SizedBox(
@@ -270,7 +276,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             final text = _messageController.text.trim();
                             if (text.isNotEmpty) {
                               chatController.sendMessage(
-                                  widget.currentUserId, text);
+                                  currentUserId!, text);
                             }
                             _messageController.clear();
                           },
@@ -302,7 +308,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.pop(ctx);
                 if (imagePickerController.imagePath.value.isNotEmpty) {
                   isLoading.value=true;
-                  await chatController.sendImageMessage(widget.currentUserId, imagePickerController.imagePath.value);
+                  await chatController.sendImageMessage(currentUserId!, imagePickerController.imagePath.value);
                   isLoading.value=false;
                   imagePickerController.imagePath.value = '';
                 }
@@ -316,7 +322,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.pop(ctx);
                 if (imagePickerController.videoPath.value.isNotEmpty) {
                   isLoading.value=true;
-                  await chatController.sendVideoMessage(widget.currentUserId, imagePickerController.videoPath.value);
+                  await chatController.sendVideoMessage(currentUserId!, imagePickerController.videoPath.value);
                   isLoading.value=false;
                   imagePickerController.videoPath.value = '';
                 }
